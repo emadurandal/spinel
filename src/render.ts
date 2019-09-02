@@ -1,4 +1,4 @@
-import Mesh from "./buffer.js";
+import Mesh from "./Mesh.js";
 
 export function drawScene(gl: WebGLRenderingContext, mesh: Mesh) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

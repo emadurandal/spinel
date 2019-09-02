@@ -1,5 +1,5 @@
 import { ShaderType, WebGLProgram } from "./definitions.js";
-import Context from "./context.js";
+import Context from "./Context.js";
 
 export default class Material {
   private _program: WebGLProgram;

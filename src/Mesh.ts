@@ -1,5 +1,5 @@
-import Material from "./shader.js";
-import Context from "./context.js";
+import Material from "./Material.js";
+import Context from "./Context.js";
 
 export default class Mesh {
   private _vertexBuffer?: WebGLBuffer;

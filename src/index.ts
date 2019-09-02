@@ -1,7 +1,7 @@
 import { drawScene } from "./render.js";
-import Mesh from "./buffer.js";
-import Material from "./shader.js";
-import Context from "./context.js";
+import Mesh from "./Mesh.js";
+import Material from "./Material.js";
+import Context from "./Context.js";
 
 
 export default function main(vertices: number[], vertexComponentNumber: number, vertexShaderStr: string, fragmentShaderStr: string) {
