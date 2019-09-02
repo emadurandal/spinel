@@ -1,23 +1,5 @@
 import { ShaderType, WebGLProgram } from "./definitions.js";
 
-const vertexShaderStr = `
-precision highp float;
-
-attribute vec3 a_position;
-
-void main(void) {
-  gl_Position = vec4(a_position, 1.0);
-}
-`;
-
-const fragmentShaderStr = `
-precision highp float;
-
-void main(void) {
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-}
-`;
-
 function compileShader(gl: WebGLRenderingContext, shaderType: ShaderType, shaderStr: string) {
 
   let shader: WebGLShader | null;
@@ -43,7 +25,7 @@ function compileShader(gl: WebGLRenderingContext, shaderType: ShaderType, shader
   return shader;
 }
 
-export function initProgram(gl: WebGLRenderingContext) {
+export function initProgram(gl: WebGLRenderingContext, vertexShaderStr: string, fragmentShaderStr: string) {
   var vertexShader = compileShader(gl, ShaderType.Vertex, vertexShaderStr) as WebGLShader;
   var fragmentShader = compileShader(gl, ShaderType.Fragment, fragmentShaderStr) as WebGLShader;
 
