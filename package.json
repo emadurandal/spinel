@@ -20,7 +20,7 @@
     "url": "https://github.com/emadurandal/spinel/issues"
   },
   "homepage": "https://github.com/emadurandal/spinel#readme",
-  "dependencies": {
+  "devDependencies": {
     "http-server": "^0.11.1",
     "typescript": "^3.6.2"
   }
