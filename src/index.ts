@@ -1,27 +1,22 @@
-import { initWebGL } from "./context.js";
-import { initProgram } from "./shader.js";
-import { initBuffers } from "./buffer.js";
 import { drawScene } from "./render.js";
+import Mesh from "./buffer.js";
+import Material from "./shader.js";
+import Context from "./context.js";
 
 
 export default function main(vertices: number[], vertexComponentNumber: number, vertexShaderStr: string, fragmentShaderStr: string) {
   const canvas = document.getElementById('world') as HTMLCanvasElement;
-  const gl = initWebGL(canvas);
+  const context = new Context(canvas);
 
-  if (gl == null) {
-    return false;
-  }
-  const shaderProgram = initProgram(gl, vertexShaderStr, fragmentShaderStr);
-  if (shaderProgram == null) {
-    return false;
-  }
+  const material = new Material(context, vertexShaderStr, fragmentShaderStr);
 
-  const vertexBuffer = initBuffers(gl, vertices, vertexComponentNumber);
+  const mesh = new Mesh(material, context, vertices, vertexComponentNumber);
 
+  const gl = context.gl;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
-  drawScene(gl, vertexBuffer, shaderProgram);
+  drawScene(gl, mesh);
 
   return true;
 }

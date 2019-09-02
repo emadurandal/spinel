@@ -1,12 +1,12 @@
-import { WebGLProgram, WebGLBuffer } from "./definitions.js";
+import Mesh from "./buffer.js";
 
-export function drawScene(gl: WebGLRenderingContext, vertexBuffer: WebGLBuffer, shaderProgram: WebGLProgram) {
+export function drawScene(gl: WebGLRenderingContext, mesh: Mesh) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer!);
   gl.vertexAttribPointer(
-    shaderProgram._attributePosition,
-    vertexBuffer._vertexComponentNumber, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer._vertexNumber);
+    mesh.material.program!._attributePosition,
+    mesh.vertexComponentNumber, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, mesh.vertexNumber);
 }
 
