@@ -1,4 +1,5 @@
 import Spinel from '../dist/index.js'
+import { VertexAttributeSet } from '../src/Mesh.js';
 
 const vertexShaderStr = `
 precision highp float;
@@ -18,20 +19,22 @@ void main(void) {
 }
 `;
 
-const vertices = [
-  0.0,  -1.0,  0.0,
-  1.0, 1.0,  0.0,
-   -1.0, 1.0,  0.0
-]
+const vertexData: VertexAttributeSet = {
+  position: [
+    0.0,  -1.0,  0.0,
+    1.0, 1.0,  0.0,
+     -1.0, 1.0,  0.0
+  ]
+}
 
 const vertexComponentNumber = 3;
 
 
-const canvas = document.getElementById('world');
+const canvas = document.getElementById('world') as HTMLCanvasElement;
 const context = new Spinel.Context(canvas);
 
 const material = new Spinel.Material(context, vertexShaderStr, fragmentShaderStr);
-const mesh = new Spinel.Mesh(material, context, vertices, vertexComponentNumber);
+const mesh = new Spinel.Mesh(material, context, vertexData);
 
 const gl = context.gl;
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
