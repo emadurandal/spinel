@@ -5,17 +5,22 @@ const vertexShaderStr = `
 precision highp float;
 
 attribute vec3 a_position;
+attribute vec4 a_color;
+varying vec4 v_color;
 
 void main(void) {
   gl_Position = vec4(a_position, 1.0);
+  v_color = a_color;
 }
 `;
 
 const fragmentShaderStr = `
 precision highp float;
 
+varying vec4 v_color;
+
 void main(void) {
-  gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  gl_FragColor = v_color;
 }
 `;
 
@@ -24,6 +29,11 @@ const vertexData: VertexAttributeSet = {
     0.0,  -1.0,  0.0,
     1.0, 1.0,  0.0,
      -1.0, 1.0,  0.0
+  ],
+  color: [
+    1.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 1.0,
+    0.0, 0.0, 1.0, 1.0
   ]
 }
 
