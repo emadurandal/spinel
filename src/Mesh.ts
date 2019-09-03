@@ -2,7 +2,7 @@ import Material from "./Material.js";
 import Context from "./Context.js";
 
 export default class Mesh {
-  private _vertexBuffer?: WebGLBuffer;
+  private _vertexBuffer: WebGLBuffer;
   private _vertexComponentNumber = 0;
   private _vertexNumber = 0;
   private _material: Material;
