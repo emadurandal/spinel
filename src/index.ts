@@ -1,4 +1,3 @@
-import { drawScene } from "./render.js";
 import Mesh from "./Mesh.js";
 import Material from "./Material.js";
 import Context from "./Context.js";
@@ -15,8 +14,9 @@ export default function main(vertices: number[], vertexComponentNumber: number, 
   const gl = context.gl;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  drawScene(gl, mesh);
+  mesh.draw();
 
   return true;
 }
