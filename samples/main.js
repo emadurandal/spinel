@@ -1,4 +1,4 @@
-import main from '../dist/index.js';
+import Spinel from '../dist/index.js'
 
 const vertexShaderStr = `
 precision highp float;
@@ -23,4 +23,20 @@ const vertices = [
   1.0, 1.0,  0.0,
    -1.0, 1.0,  0.0
 ]
-main(vertices, 3, vertexShaderStr, fragmentShaderStr);
+
+const vertexComponentNumber = 3;
+
+
+const canvas = document.getElementById('world');
+const context = new Spinel.Context(canvas);
+
+const material = new Spinel.Material(context, vertexShaderStr, fragmentShaderStr);
+const mesh = new Spinel.Mesh(material, context, vertices, vertexComponentNumber);
+
+const gl = context.gl;
+gl.clearColor(0.0, 0.0, 0.0, 1.0);
+gl.enable(gl.DEPTH_TEST);
+gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+mesh.draw();
+
