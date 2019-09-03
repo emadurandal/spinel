@@ -11,7 +11,7 @@ export type VertexAttributeSet = {
 
 export default class Mesh {
   private _positionBuffer: WebGLBuffer;
-  private _colorBuffer?: WebGLBuffer;
+  private _colorBuffer: WebGLBuffer;
 
   private _vertexNumber = 0;
   private _material: Material;
@@ -24,21 +24,25 @@ export default class Mesh {
     this._context = context;
     this._vertexNumber = vertexData.position.length / Mesh._positionComponentNumber;
 
-    this._positionBuffer = this._setupVertexBuffer(vertexData.position)!;
-    this._colorBuffer = this._setupVertexBuffer(vertexData.color!);
+    this._positionBuffer = this._setupVertexBuffer(vertexData.position, [0, 0, 0]);
+    this._colorBuffer = this._setupVertexBuffer(vertexData.color!, [1, 1, 1, 1]);
 
   }
 
-  private _setupVertexBuffer(array: number[]) {
-    if (array != null) {
-      const gl = this._context.gl;
-      const buffer = gl.createBuffer() as WebGLBuffer;
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
-      return buffer;
+  private _setupVertexBuffer(_array: number[], defaultArray: number[]) {
+    let array = _array;
+    if (array == null) {
+      array = [];
+      for (let i=0; i<this._vertexNumber; i++) {
+        array = array.concat(defaultArray);
+      }
     }
 
-    return undefined;
+    const gl = this._context.gl;
+    const buffer = gl.createBuffer() as WebGLBuffer;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
+    return buffer;
   }
 
   private _setVertexAttribPointer(vertexBuffer: WebGLBuffer, attributeSlot: number, componentNumber: number) {
