@@ -34,6 +34,9 @@ const vertexData: VertexAttributeSet = {
     1.0, 0.0, 0.0, 1.0,
     0.0, 1.0, 0.0, 1.0,
     0.0, 0.0, 1.0, 1.0
+  ],
+  indices: [
+    0, 1, 2
   ]
 }
 

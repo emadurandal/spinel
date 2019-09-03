@@ -12,8 +12,10 @@ export type VertexAttributeSet = {
 export default class Mesh {
   private _positionBuffer: WebGLBuffer;
   private _colorBuffer: WebGLBuffer;
+  private _indexBuffer?: WebGLBuffer;
 
   private _vertexNumber = 0;
+  private _indexNumber = 0;
   private _material: Material;
   private _context: Context;
   private static readonly _positionComponentNumber = 3;
@@ -27,6 +29,10 @@ export default class Mesh {
     this._positionBuffer = this._setupVertexBuffer(vertexData.position, [0, 0, 0]);
     this._colorBuffer = this._setupVertexBuffer(vertexData.color!, [1, 1, 1, 1]);
 
+    if (vertexData.indices != null) {
+      this._indexBuffer = this._setupIndexBuffer(vertexData.indices);
+      this._indexNumber = vertexData.indices.length;
+    }
   }
 
   private _setupVertexBuffer(_array: number[], defaultArray: number[]) {
@@ -42,6 +48,15 @@ export default class Mesh {
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
+
+    return buffer;
+  }
+
+  private _setupIndexBuffer(indicesArray: number[]) {
+    const gl = this._context.gl;
+    const buffer = gl.createBuffer() as WebGLBuffer;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indicesArray), gl.STATIC_DRAW);
     return buffer;
   }
 
@@ -61,7 +76,13 @@ export default class Mesh {
     this._setVertexAttribPointer(this._positionBuffer, this.material.program!._attributePosition, Mesh._positionComponentNumber);
     this._setVertexAttribPointer(this._colorBuffer!, this.material.program!._attributeColor, Mesh._colorComponentNumber);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this.vertexNumber);
+    if (this._indexBuffer != null) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+      gl.drawElements(gl.TRIANGLES, this._indexNumber, gl.UNSIGNED_SHORT, 0);
+    } else {
+      gl.drawArrays(gl.TRIANGLES, 0, this.vertexNumber);
+    }
+
   }
 
   get vertexNumber() {
