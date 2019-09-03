@@ -22,39 +22,40 @@ export default class Mesh {
   constructor(material: Material, context: Context, vertexData: VertexAttributeSet) {
     this._material = material;
     this._context = context;
-    const gl = context.gl;
     this._vertexNumber = vertexData.position.length / Mesh._positionComponentNumber;
 
-    // position
-    const positionBuffer = gl.createBuffer() as WebGLBuffer;
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData.position), gl.STATIC_DRAW);
-    this._positionBuffer = positionBuffer;
+    this._positionBuffer = this._setupVertexBuffer(vertexData.position)!;
+    this._colorBuffer = this._setupVertexBuffer(vertexData.color!);
 
-    // color
-    if (vertexData.color) {
-      const colorBuffer = gl.createBuffer() as WebGLBuffer;
-      gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData.color), gl.STATIC_DRAW);
-      this._colorBuffer = colorBuffer;
+  }
+
+  private _setupVertexBuffer(array: number[]) {
+    if (array != null) {
+      const gl = this._context.gl;
+      const buffer = gl.createBuffer() as WebGLBuffer;
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
+      return buffer;
     }
 
+    return undefined;
+  }
+
+  private _setVertexAttribPointer(vertexBuffer: WebGLBuffer, attributeSlot: number, componentNumber: number) {
+    if (vertexBuffer != null) {
+      const gl = this._context.gl;
+      gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+      gl.vertexAttribPointer(
+        attributeSlot,
+        componentNumber, gl.FLOAT, false, 0, 0);
+    }
   }
 
   draw() {
     const gl = this._context.gl;
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._positionBuffer);
-    gl.vertexAttribPointer(
-      this.material.program!._attributePosition,
-      Mesh._positionComponentNumber, gl.FLOAT, false, 0, 0);
-
-    if (this._colorBuffer) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this._colorBuffer);
-      gl.vertexAttribPointer(
-        this.material.program!._attributeColor,
-        Mesh._colorComponentNumber, gl.FLOAT, false, 0, 0);
-    }
+    this._setVertexAttribPointer(this._positionBuffer, this.material.program!._attributePosition, Mesh._positionComponentNumber);
+    this._setVertexAttribPointer(this._colorBuffer!, this.material.program!._attributeColor, Mesh._colorComponentNumber);
 
     gl.drawArrays(gl.TRIANGLES, 0, this.vertexNumber);
   }
