@@ -5,4 +5,5 @@ export enum ShaderType {
 
 export interface WebGLProgram {
   _attributePosition: number;
+  _attributeColor: number;
 }

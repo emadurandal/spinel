@@ -1,2 +1,4 @@
 dist
 node_modules
+samples/main.js
+src/*.js

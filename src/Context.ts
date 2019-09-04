@@ -13,4 +13,5 @@ export default class Context {
   get gl() {
     return this._gl;
   }
+
 }

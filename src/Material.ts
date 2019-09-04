@@ -27,6 +27,8 @@ export default class Material {
 
     shaderProgram._attributePosition = gl.getAttribLocation(shaderProgram, "a_position");
     gl.enableVertexAttribArray(shaderProgram._attributePosition);
+    shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
+    gl.enableVertexAttribArray(shaderProgram._attributeColor);
 
     this._program = shaderProgram;
 
