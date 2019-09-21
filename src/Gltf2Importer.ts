@@ -1,12 +1,14 @@
-import Mesh from './Mesh.js';
+import Mesh, { VertexAttributeSet } from './Mesh.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2 } from './glTF2.js';
+import Material from './Material.js';
+import Context from './Context.js';
 
 export default class Gltf2Importer {
   private static __instance: Gltf2Importer;
 
   private constructor() {}
 
-  async import(uri: string) {
+  async import(uri: string, context: Context, material: Material) {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -19,9 +21,9 @@ export default class Gltf2Importer {
 
     const arrayBufferBin = await this._loadBin(json, uri);
 
-    this._loadMesh(arrayBufferBin, json);
+    const meshes = this._loadMesh(arrayBufferBin, json, context, material);
 
-    console.log(arrayBufferBin);
+    return meshes;
   }
 
   private _arrayBufferToString(arrayBuffer: ArrayBuffer) {
@@ -102,7 +104,7 @@ export default class Gltf2Importer {
     }
   }
 
-  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2) {
+  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context, material: Material) {
     const meshes: Mesh[] = []
     for (let mesh of json.meshes) {
       const primitive = mesh.primitives[0];
@@ -117,10 +119,17 @@ export default class Gltf2Importer {
       const count = positionAccessor.count;
       const typedArrayComponentCount = positionComponentNum * count;
       const positionTypedArrayClass = this._componentTypedArray(positionAccessor.componentType);
-      const positionTypedArray = new positionTypedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount);
+      const positionTypedArray = new positionTypedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Float32Array;
 
-      console.log(positionTypedArray);
+      const vertexData: VertexAttributeSet = {
+        position: positionTypedArray
+      }
+      const libMesh = new Mesh(material, context, vertexData);
+      meshes.push(libMesh);
+
     }
+
+    return meshes;
   }
 
 

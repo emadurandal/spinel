@@ -2,11 +2,11 @@ import Material from "./Material.js";
 import Context from "./Context.js";
 
 export type VertexAttributeSet = {
-  position: number[],
-  color?: number[],
-  normal?: number[],
-  texcoord?: number[],
-  indices?: number[]
+  position: number[] | Float32Array,
+  color?: number[] | Float32Array,
+  normal?: number[] | Float32Array,
+  texcoord?: number[] | Float32Array,
+  indices?: number[] | Uint16Array
 }
 
 export default class Mesh {
@@ -35,7 +35,7 @@ export default class Mesh {
     }
   }
 
-  private _setupVertexBuffer(_array: number[], defaultArray: number[]) {
+  private _setupVertexBuffer(_array: number[] | Float32Array, defaultArray: number[]) {
     let array = _array;
     if (array == null) {
       array = [];
@@ -47,16 +47,18 @@ export default class Mesh {
     const gl = this._context.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(array), gl.STATIC_DRAW);
+    const typedArray = (array.constructor === Float32Array) ? array as Float32Array : new Float32Array(array);
+    gl.bufferData(gl.ARRAY_BUFFER, typedArray, gl.STATIC_DRAW);
 
     return buffer;
   }
 
-  private _setupIndexBuffer(indicesArray: number[]) {
+  private _setupIndexBuffer(indicesArray: number[] | Uint16Array) {
     const gl = this._context.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indicesArray), gl.STATIC_DRAW);
+    const typedArray = (indicesArray.constructor === Uint16Array) ? indicesArray as Uint16Array : new Uint16Array(indicesArray);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, typedArray, gl.STATIC_DRAW);
     return buffer;
   }
 
