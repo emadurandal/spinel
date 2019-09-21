@@ -40,8 +40,8 @@ const vertexData: VertexAttributeSet = {
   ]
 }
 
-const vertexComponentNumber = 3;
-
+const glTF2Importer = Spinel.Gltf2Importer.getInstance();
+glTF2Importer.import('../assets/gltf/BoxAnimated/glTF/BoxAnimated.gltf');
 
 const canvas = document.getElementById('world') as HTMLCanvasElement;
 const context = new Spinel.Context(canvas);
