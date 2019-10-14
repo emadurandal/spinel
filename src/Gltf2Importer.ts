@@ -1,5 +1,5 @@
 import Mesh, { VertexAttributeSet } from './Mesh.js';
-import { Gltf2Accessor, Gltf2BufferView, Gltf2 } from './glTF2.js';
+import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import Material from './Material.js';
 import Context from './Context.js';
 
@@ -109,20 +109,17 @@ export default class Gltf2Importer {
     for (let mesh of json.meshes) {
       const primitive = mesh.primitives[0];
       const attributes = primitive.attributes;
-      const positionAccessor = json.accessors[attributes.POSITION] as Gltf2Accessor;
-      const positionBufferView = json.bufferViews[positionAccessor.bufferView!] as Gltf2BufferView;
-      const byteOffsetOfBufferView = positionBufferView.byteOffset!;
-      const byteOffsetOfAccessor = positionAccessor.byteOffset!;
-      const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
-      const positionComponentBytes = this._componentBytes(positionAccessor.componentType);
-      const positionComponentNum = this._componentNum(positionAccessor.type);
-      const count = positionAccessor.count;
-      const typedArrayComponentCount = positionComponentNum * count;
-      const positionTypedArrayClass = this._componentTypedArray(positionAccessor.componentType);
-      const positionTypedArray = new positionTypedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Float32Array;
+
+
+      const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
+      let colorTypedArray: Float32Array;
+      if (attributes.COLOR_0) {
+        colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
+      }
 
       const vertexData: VertexAttributeSet = {
-        position: positionTypedArray
+        position: positionTypedArray,
+        color: colorTypedArray!
       }
       const libMesh = new Mesh(material, context, vertexData);
       meshes.push(libMesh);
@@ -132,6 +129,21 @@ export default class Gltf2Importer {
     return meshes;
   }
 
+
+  private getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
+    const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
+    const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
+    const byteOffsetOfBufferView = bufferView.byteOffset!;
+    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
+    const componentBytes = this._componentBytes(accessor.componentType);
+    const componentNum = this._componentNum(accessor.type);
+    const count = accessor.count;
+    const typedArrayComponentCount = componentNum * count;
+    const typedArrayClass = this._componentTypedArray(accessor.componentType);
+    const typedArray = new typedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Float32Array;
+    return typedArray;
+  }
 
   static getInstance() {
     if (!this.__instance) {
