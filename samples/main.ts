@@ -1,5 +1,4 @@
 import Spinel from '../dist/index.js'
-import { VertexAttributeSet } from '../src/Mesh.js';
 
 const vertexShaderStr = `
 precision highp float;
@@ -24,35 +23,24 @@ void main(void) {
 }
 `;
 
-const vertexData: VertexAttributeSet = {
-  position: [
-    0.0,  -1.0,  0.0,
-    1.0, 1.0,  0.0,
-     -1.0, 1.0,  0.0
-  ],
-  color: [
-    1.0, 0.0, 0.0, 1.0,
-    0.0, 1.0, 0.0, 1.0,
-    0.0, 0.0, 1.0, 1.0
-  ],
-  indices: [
-    0, 1, 2
-  ]
+
+async function main() {
+
+  const canvas = document.getElementById('world') as HTMLCanvasElement;
+  const context = new Spinel.Context(canvas);
+  const material = new Spinel.Material(context, vertexShaderStr, fragmentShaderStr);
+  const glTF2Importer = Spinel.Gltf2Importer.getInstance();
+  const meshes = await glTF2Importer.import('../assets/gltf/BoxAnimated/glTF/BoxAnimated.gltf', context, material);
+
+  const gl = context.gl;
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  for (let mesh of meshes) {
+    mesh.draw();
+  }
+
 }
 
-const glTF2Importer = Spinel.Gltf2Importer.getInstance();
-glTF2Importer.import('../assets/gltf/BoxAnimated/glTF/BoxAnimated.gltf');
-
-const canvas = document.getElementById('world') as HTMLCanvasElement;
-const context = new Spinel.Context(canvas);
-
-const material = new Spinel.Material(context, vertexShaderStr, fragmentShaderStr);
-const mesh = new Spinel.Mesh(material, context, vertexData);
-
-const gl = context.gl;
-gl.clearColor(0.0, 0.0, 0.0, 1.0);
-gl.enable(gl.DEPTH_TEST);
-gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-mesh.draw();
-
+main();
