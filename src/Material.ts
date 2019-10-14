@@ -32,6 +32,8 @@ export default class Material {
     shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
     gl.enableVertexAttribArray(shaderProgram._attributeColor);
 
+    shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
+
     this._program = shaderProgram;
 
   }
@@ -67,8 +69,7 @@ export default class Material {
   }
 
   setUniformValues(gl: WebGLRenderingContext) {
-    const u_baseColor = gl.getUniformLocation(this._program, 'u_baseColor');
-    gl.uniform4fv(u_baseColor, this._baseColor.raw);
+    gl.uniform4fv(this._program._uniformBaseColor, this._baseColor.raw);
   }
 
   set baseColor(color: Vector4) {
