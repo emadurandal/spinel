@@ -1,8 +1,10 @@
 import { ShaderType, WebGLProgram } from "./definitions.js";
 import Context from "./Context.js";
+import Vector4 from "./Vector4.js";
 
 export default class Material {
   private _program: WebGLProgram;
+  private _baseColor = new Vector4(1, 1, 1, 1);
 
   constructor(context: Context, vertexShaderStr: string, fragmentShaderStr: string) {
     const gl = context.gl;
@@ -29,6 +31,8 @@ export default class Material {
     gl.enableVertexAttribArray(shaderProgram._attributePosition);
     shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
     gl.enableVertexAttribArray(shaderProgram._attributeColor);
+
+    shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
 
     this._program = shaderProgram;
 
@@ -60,9 +64,24 @@ export default class Material {
     return shader;
   }
 
-
   get program() {
     return this._program
+  }
+
+  setUniformValues(gl: WebGLRenderingContext) {
+    gl.uniform4fv(this._program._uniformBaseColor, this._baseColor.raw);
+  }
+
+  set baseColor(color: Vector4) {
+    this._baseColor = color;
+  }
+
+  get baseColor(): Vector4 {
+    return this._baseColor;
+  }
+
+  useProgram(gl: WebGLRenderingContext) {
+    gl.useProgram(this._program);
   }
 
 }

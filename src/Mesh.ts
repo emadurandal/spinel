@@ -78,6 +78,9 @@ export default class Mesh {
     this._setVertexAttribPointer(this._positionBuffer, this.material.program!._attributePosition, Mesh._positionComponentNumber);
     this._setVertexAttribPointer(this._colorBuffer!, this.material.program!._attributeColor, Mesh._colorComponentNumber);
 
+    this._material.useProgram(gl);
+    this._material.setUniformValues(gl);
+
     if (this._indexBuffer != null) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
       gl.drawElements(gl.TRIANGLES, this._indexNumber, gl.UNSIGNED_SHORT, 0);
