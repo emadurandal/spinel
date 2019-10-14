@@ -1,8 +1,9 @@
-import Mesh, { VertexAttributeSet } from './Mesh.js';
+import Primitive, { VertexAttributeSet } from './Primitive.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import Material from './Material.js';
 import Context from './Context.js';
 import Vector4 from './Vector4.js';
+import Mesh from './Mesh.js';
 
 export default class Gltf2Importer {
   private static __instance: Gltf2Importer;
@@ -150,29 +151,32 @@ void main(void) {
 
   private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
     const meshes: Mesh[] = []
-    for (let mesh of json.meshes) {
-      const primitive = mesh.primitives[0];
-      const attributes = primitive.attributes;
+    for (let meshJson of json.meshes) {
+      const primitives: Primitive[] = [];
+      for (let primitiveJson of meshJson.primitives) {
+        const attributes = primitiveJson.attributes;
 
-      let materialIndex = -1;
-      if (primitive.material != null) {
-        materialIndex = primitive.material;
+        let materialIndex = -1;
+        if (primitiveJson.material != null) {
+          materialIndex = primitiveJson.material;
+        }
+        const material = this._loadMaterial(json, materialIndex, context);
+
+        const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
+        let colorTypedArray: Float32Array;
+        if (attributes.COLOR_0) {
+          colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
+        }
+
+        const vertexData: VertexAttributeSet = {
+          position: positionTypedArray,
+          color: colorTypedArray!
+        }
+        const primitive = new Primitive(material, context, vertexData);
+        primitives.push(primitive);
       }
-      const material = this._loadMaterial(json, materialIndex, context);
-
-      const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
-      let colorTypedArray: Float32Array;
-      if (attributes.COLOR_0) {
-        colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
-      }
-
-      const vertexData: VertexAttributeSet = {
-        position: positionTypedArray,
-        color: colorTypedArray!
-      }
-      const libMesh = new Mesh(material, context, vertexData);
-      meshes.push(libMesh);
-
+      const mesh = new Mesh(primitives);
+      meshes.push(mesh);
     }
 
     return meshes;
