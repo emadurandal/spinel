@@ -93,7 +93,7 @@ export type Gltf2PbrMetallicRoughness = {
 }
 
 export type Gltf2Material = {
-  pbrMetallicRoughness?: Object,
+  pbrMetallicRoughness?: Gltf2PbrMetallicRoughness,
   normalTexture?: Gltf2NormalTextureInfo,
   occlusionTexture? : Gltf2OcclusionTextureInfo,
   emissiveTexture?: Gltf2TextureInfo,

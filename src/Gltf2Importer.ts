@@ -2,13 +2,37 @@ import Mesh, { VertexAttributeSet } from './Mesh.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import Material from './Material.js';
 import Context from './Context.js';
+import Vector4 from './Vector4.js';
 
 export default class Gltf2Importer {
   private static __instance: Gltf2Importer;
+  private static readonly vertexShaderStr = `
+precision highp float;
+
+attribute vec3 a_position;
+attribute vec4 a_color;
+varying vec4 v_color;
+
+void main(void) {
+  gl_Position = vec4(a_position, 1.0);
+  v_color = a_color;
+}
+`;
+
+private static readonly fragmentShaderStr = `
+precision highp float;
+
+varying vec4 v_color;
+uniform vec4 u_baseColor;
+
+void main(void) {
+  gl_FragColor = v_color * u_baseColor;
+}
+`;
 
   private constructor() {}
 
-  async import(uri: string, context: Context, material: Material) {
+  async import(uri: string, context: Context) {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -21,7 +45,7 @@ export default class Gltf2Importer {
 
     const arrayBufferBin = await this._loadBin(json, uri);
 
-    const meshes = this._loadMesh(arrayBufferBin, json, context, material);
+    const meshes = this._loadMesh(arrayBufferBin, json, context);
 
     return meshes;
   }
@@ -104,12 +128,37 @@ export default class Gltf2Importer {
     }
   }
 
-  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context, material: Material) {
+  private _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
+    const material = new Material(context, Gltf2Importer.vertexShaderStr, Gltf2Importer.fragmentShaderStr);
+
+    if (materialIndex >= 0) {
+      const materialJson = json.materials[materialIndex];
+
+      let baseColor = new Vector4(1, 1, 1, 1);
+      if (materialJson.pbrMetallicRoughness != null) {
+        if (materialJson.pbrMetallicRoughness.baseColorFactor != null) {
+          const baseColorArray = materialJson.pbrMetallicRoughness.baseColorFactor;
+          baseColor = new Vector4(baseColorArray[0], baseColorArray[1], baseColorArray[2], baseColorArray[3]);
+        }
+      }
+
+      material.baseColor = baseColor;
+    }
+
+    return material;
+  }
+
+  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
     const meshes: Mesh[] = []
     for (let mesh of json.meshes) {
       const primitive = mesh.primitives[0];
       const attributes = primitive.attributes;
 
+      let materialIndex = -1;
+      if (primitive.material != null) {
+        materialIndex = primitive.material;
+      }
+      const material = this._loadMaterial(json, materialIndex, context);
 
       const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
       let colorTypedArray: Float32Array;
