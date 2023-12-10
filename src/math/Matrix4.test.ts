@@ -1,6 +1,6 @@
-import { Matrix4 } from "./Matrix4";
-import { Vector3 } from "./Vector3";
-import { Vector4 } from "./Vector4";
+import { Matrix4 } from "./Matrix4.js";
+import { Vector3 } from "./Vector3.js";
+import { Vector4 } from "./Vector4.js";
 
 
 test("Matrix4.toString()", () => {

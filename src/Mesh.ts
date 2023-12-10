@@ -1,4 +1,4 @@
-import { Primitive } from "./Primitive";
+import { Primitive } from "./Primitive.js";
 
 export class Mesh {
   private _primitives: Primitive[];
