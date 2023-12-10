@@ -1,4 +1,4 @@
-export default class Context {
+export class Context {
   private _gl: WebGLRenderingContext;
   constructor(canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl') as WebGLRenderingContext;

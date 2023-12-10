@@ -1,6 +1,6 @@
-import Primitive from "./Primitive";
+import { Primitive } from "./Primitive";
 
-export default class Mesh {
+export class Mesh {
   private _primitives: Primitive[];
 
   constructor(primitives: Primitive[]) {
