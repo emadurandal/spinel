@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npx tsc --project . --module es2015 --outDir ./dist",
     "sample-build": "npx tsc ./samples/main.ts --lib es2015,dom --target esNext",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "npx http-server ./ -o"
   },
   "repository": {
@@ -22,7 +22,10 @@
   },
   "homepage": "https://github.com/emadurandal/spinel#readme",
   "devDependencies": {
+    "@types/jest": "^29.5.11",
     "http-server": "^14.1.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.3.3"
   }
 }
