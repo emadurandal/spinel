@@ -1,6 +1,6 @@
 import { ShaderType, WebGLProgram } from "./definitions.js";
 import Context from "./Context.js";
-import Vector4 from "./Vector4.js";
+import Vector4 from "./math/Vector4.js";
 
 export default class Material {
   private _program: WebGLProgram;
