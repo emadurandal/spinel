@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "npx tsc --project . --module es2015 --outDir ./dist",
-    "sample-build": "npx tsc ./samples/main.ts --lib es2015,dom --target esNext",
+    "sample-build": "npx tsc ./samples/main.ts --lib es2015,dom --target esNext --moduleResolution node",
     "test": "jest",
     "start": "npx http-server ./ -o"
   },
