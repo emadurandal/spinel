@@ -1,4 +1,4 @@
-export default class Vector4 {
+export class Vector4 {
   private v: Float32Array;
 
   constructor(x: number, y: number, z: number, w: number) {

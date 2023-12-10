@@ -1,5 +1,5 @@
-import Material from "./Material.js";
-import Context from "./Context.js";
+import { Material } from "./Material.js";
+import { Context } from "./Context.js";
 
 export type VertexAttributeSet = {
   position: number[] | Float32Array,
@@ -9,7 +9,7 @@ export type VertexAttributeSet = {
   indices?: number[] | Uint16Array
 }
 
-export default class Primitive {
+export class Primitive {
   private _positionBuffer: WebGLBuffer;
   private _colorBuffer: WebGLBuffer;
   private _indexBuffer?: WebGLBuffer;
