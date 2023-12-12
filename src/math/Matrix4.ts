@@ -1,3 +1,4 @@
+import { Quaternion } from "./Quaternion.js";
 import { Vector3 } from "./Vector3.js";
 import { Vector4 } from "./Vector4.js";
 
@@ -131,6 +132,42 @@ export class Matrix4 {
       0, vec.y, 0, 0, 
       0, 0, vec.z, 0, 
       0, 0, 0, 1
+    );
+  }
+
+  static fromQuaternion(q: Quaternion) {
+    const sx = q.x * q.x;
+    const sy = q.y * q.y;
+    const sz = q.z * q.z;
+    const cx = q.y * q.z;
+    const cy = q.x * q.z;
+    const cz = q.x * q.y;
+    const wx = q.w * q.x;
+    const wy = q.w * q.y;
+    const wz = q.w * q.z;
+
+    const v0 = 1.0 - 2.0 * (sy + sz);
+    const v4 = 2.0 * (cz - wz);
+    const v8 = 2.0 * (cy + wy);
+    const v12 = 0;
+    const v1 = 2.0 * (cz + wz);
+    const v5 = 1.0 - 2.0 * (sx + sz);
+    const v9 = 2.0 * (cx - wx);
+    const v13 = 0;
+    const v2 = 2.0 * (cy - wy);
+    const v6 = 2.0 * (cx + wx);
+    const v10 = 1.0 - 2.0 * (sx + sy);
+    const v14 = 0;
+    const v3 = 0;
+    const v7 = 0;
+    const v11 = 0;
+    const v15 = 1;
+
+    return new Matrix4(
+      v0, v4, v8, v12,
+      v1, v5, v9, v13,
+      v2, v6, v10, v14,
+      v3, v7, v11, v15
     );
   }
 
