@@ -1,11 +1,34 @@
+import { Matrix4 } from "./Matrix4.js";
 import { Quaternion } from "./Quaternion.js";
 import { Vector3 } from "./Vector3.js";
+import { Vector4 } from "./Vector4.js";
 
 test("Quaternion toEulerAngle", ()=>{
-    const q = new Quaternion(0.128, 0.145, 0.269, 0.944);
-    const e = q.toEulerAngles();
+  const q = new Quaternion(0.5, 0.5, 0.5, 0.5);
+  const e = q.toEulerAngles();
 
-    console.log(e);
+  expect(e.isEqual(new Vector3(Math.PI / 2, 0, Math.PI / 2))).toBe(true);
+});
 
-    expect(e.isEqual(new Vector3(0.175077423453331, 0.34970852732658386, 0.5247366428375244))).toBe(true);
+test("Quaternion.multiply", () => {
+  const qx = new Quaternion(0.383, 0, 0, 0.924); // 45 degree rotation around x axis
+  const qy = new Quaternion(0, 0.383, 0, 0.924); // 45 degree rotation around y axis
+  const qyx = qy.multiply(qx);
+
+  const mx = Matrix4.fromQuaternion(qx);
+  const my = Matrix4.fromQuaternion(qy);
+  const myx = my.multiply(mx);
+  const myx2 = Matrix4.fromQuaternion(qyx);
+
+  expect(myx.isEqual(myx2, 0.001)).toBe(true);
+});
+
+test("Quaternion.multiply", () => {
+  const qx = new Quaternion(0.383, 0, 0, 0.924); // 45 degree rotation around x axis
+  const qy = new Quaternion(0, 0.383, 0, 0.924); // 45 degree rotation around y axis
+  const qyx = qy.multiply(qx);
+  const myx = Matrix4.fromQuaternion(qyx);
+  const myx2 = Matrix4.rotationXYZ(qyx.toEulerAngles());
+
+  expect(myx.isEqual(myx2, 0.001)).toBe(true);
 });

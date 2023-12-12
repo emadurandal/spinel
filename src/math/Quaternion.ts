@@ -100,28 +100,28 @@ export class Quaternion {
     }
   }
 
-  static multiply(l_quat: Quaternion, r_quat: Quaternion) {
+  multiply(q: Quaternion) {
     const x =
-      r_quat.w * l_quat.x +
-      r_quat.z * l_quat.y -
-      r_quat.x * l_quat.z +
-      r_quat.x * l_quat.w;
+      q.w * this.x +
+      q.z * this.y -
+      q.y * this.z +
+      q.x * this.w;
     const y =
-      -r_quat.z * l_quat.x +
-      r_quat.w * l_quat.y +
-      r_quat.x * l_quat.z +
-      r_quat.y * l_quat.w;
+      -q.z * this.x +
+      q.w * this.y +
+      q.x * this.z +
+      q.y * this.w;
     const z =
-      r_quat.y * l_quat.x -
-      r_quat.x * l_quat.y +
-      r_quat.w * l_quat.z +
-      r_quat.z * l_quat.w;
+      q.y * this.x -
+      q.x * this.y +
+      q.w * this.z +
+      q.z * this.w;
     const w =
-      -r_quat.x * l_quat.x -
-      r_quat.y * l_quat.y -
-      r_quat.z * l_quat.z +
-      r_quat.w * l_quat.w;
-      
+      -q.x * this.x -
+      q.y * this.y -
+      q.z * this.z +
+      q.w * this.w;
+
     return new Quaternion(x, y, z, w);
   }
 
@@ -153,14 +153,14 @@ export class Quaternion {
 		const e15 = 1;
 
     // order: XYZ
-    const _y = Math.asin( Math.max(-1, Math.min(1, e8) ) );
-    if ( Math.abs( e8 ) < 0.99999 ) {
-      const _x = Math.atan2( - e9, e10 );
-      const _z = Math.atan2( - e4, e0 );
+    const _y = Math.asin( - Math.max(-1, Math.min(1, e2) ) );
+    if ( Math.abs( e2 ) < 0.99999 ) {
+      const _x = Math.atan2( e6, e10 );
+      const _z = Math.atan2( e1, e0 );
       return new Vector3(_x, _y, _z);
     } else {
-      const _x = Math.atan2( e6, e5 );
-      const _z = 0;
+      const _x = 0
+      const _z = Math.atan2( -e4, e5 );
       return new Vector3(_x, _y, _z);
     }
   }
