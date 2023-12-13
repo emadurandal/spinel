@@ -5,6 +5,14 @@ export class Vector3 {
     this.v = new Float32Array([x, y, z]);
   }
 
+  isEqual(vec: Vector3, delta = Number.EPSILON) {
+    return (
+      Math.abs(this.x - vec.x) < delta &&
+      Math.abs(this.y - vec.y) < delta &&
+      Math.abs(this.z - vec.z) < delta
+    );
+  }
+
   get x() {
     return this.v[0];
   }

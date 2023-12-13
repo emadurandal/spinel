@@ -1,4 +1,5 @@
 import { Matrix4 } from "./Matrix4.js";
+import { Quaternion } from "./Quaternion.js";
 import { Vector3 } from "./Vector3.js";
 import { Vector4 } from "./Vector4.js";
 
@@ -132,3 +133,34 @@ test("Matrix4.scale()", () => {
   expect(a.isEqual(b)).toBe(true);
 });
 
+test("Matrix4.fromQuaternion", () => {
+  const a = Matrix4.fromQuaternion(new Quaternion(0.707, 0, 0, 0.707)); // 90 degree rotation around x axis
+  const b = Matrix4.rotationX(Math.PI / 2);
+  
+  const c = new Matrix4(
+    1, 0, 0, 0, 
+    0, 0, -1, 0, 
+    0, 1, 0, 0, 
+    0, 0, 0, 1
+  );
+
+  expect(a.isEqual(b, 0.001)).toBe(true);
+  expect(a.isEqual(c, 0.001)).toBe(true);
+})
+
+test("Matrix4.fromQuaternion", () => {
+  const a = Matrix4.fromQuaternion(new Quaternion(0, 0.707, 0, 0.707)); // 90 degree rotation around y axis
+  const b = Matrix4.rotationY(Math.PI / 2);
+  
+  expect(a.isEqual(b, 0.001)).toBe(true);
+})
+
+test("Matrix4.fromQuaternion 2", () => {
+  const q = new Quaternion(0.5, 0.5, 0.5, 0.5);
+  const a = Matrix4.fromQuaternion(q); // 90 degree rotation around x axis, then 90 degree rotation around y axis
+  const b = Matrix4.rotationXYZ(q.toEulerAngles());
+  const c = Matrix4.rotationXYZ(new Vector3(Math.PI / 2, 0, Math.PI / 2));
+
+  expect(a.isEqual(b, 0.001)).toBe(true);
+  expect(a.isEqual(c, 0.001)).toBe(true);
+})
