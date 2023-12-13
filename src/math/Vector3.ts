@@ -40,4 +40,8 @@ export class Vector3 {
   get raw() {
     return this.v;
   }
+
+  clone(): Vector3 {
+    return new Vector3(this.x, this.y, this.z);
+  }
 }
