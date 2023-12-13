@@ -1,3 +1,4 @@
+import { Matrix4 } from "./Matrix4.js";
 import { Vector3 } from "./Vector3.js";
 
 export class Quaternion {
@@ -162,6 +163,40 @@ export class Quaternion {
       const _x = 0
       const _z = Math.atan2( -e4, e5 );
       return new Vector3(_x, _y, _z);
+    }
+  }
+
+  static fromMatrix4(mat: Matrix4) {
+    const tr = mat.m00 + mat.m11 + mat.m22;
+
+    if (tr > 0) {
+      const S = 0.5 / Math.sqrt(tr + 1.0);
+      const x = (mat.m21 - mat.m12) * S;
+      const y = (mat.m02 - mat.m20) * S;
+      const z = (mat.m10 - mat.m01) * S;
+      const w = 0.25 / S;
+      return new Quaternion(x, y, z, w);
+    } else if (mat.m00 > mat.m11 && mat.m00 > mat.m22) {
+      const S = Math.sqrt(1.0 + mat.m00 - mat.m11 - mat.m22) * 2;
+      const x = 0.25 * S;
+      const y = (mat.m01 + mat.m10) / S;
+      const z = (mat.m02 + mat.m20) / S;
+      const w = (mat.m21 - mat.m12) / S;
+      return new Quaternion(x, y, z, w);
+    } else if (mat.m11 > mat.m22) {
+      const S = Math.sqrt(1.0 + mat.m11 - mat.m00 - mat.m22) * 2;
+      const x = (mat.m01 + mat.m10) / S;
+      const y = 0.25 * S;
+      const z = (mat.m12 + mat.m21) / S;
+      const w = (mat.m02 - mat.m20) / S;
+      return new Quaternion(x, y, z, w);
+    } else {
+      const S = Math.sqrt(1.0 + mat.m22 - mat.m00 - mat.m11) * 2;
+      const x = (mat.m02 + mat.m20) / S;
+      const y = (mat.m12 + mat.m21) / S;
+      const z = 0.25 * S;
+      const w = (mat.m10 - mat.m01) / S;
+      return new Quaternion(x, y, z, w);
     }
   }
 }

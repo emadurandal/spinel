@@ -32,3 +32,11 @@ test("Quaternion.multiply", () => {
 
   expect(myx.isEqual(myx2, 0.001)).toBe(true);
 });
+
+test("Quaternion.fromMatrix4", () => {
+  const q = new Quaternion(0.5, 0.5, 0.5, 0.5);
+  const m = Matrix4.fromQuaternion(q);
+  const q2 = Quaternion.fromMatrix4(m);
+
+  expect(q.isEqual(q2)).toBe(true);
+});
