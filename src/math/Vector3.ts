@@ -44,4 +44,8 @@ export class Vector3 {
   clone(): Vector3 {
     return new Vector3(this.x, this.y, this.z);
   }
+
+  toString() {
+    return `${this.x}, ${this.y}, ${this.z}`;
+  }
 }

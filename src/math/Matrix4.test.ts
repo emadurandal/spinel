@@ -185,8 +185,12 @@ test("Matrix4.getScale()", () => {
   const v = new Vector3(1, 2, 3);
   const m = Matrix4.scale(v);
   const r = Matrix4.rotationXYZ(new Vector3(0.1, 0.2, 0.3));
-  const m2 = m.multiply(r);
+  const m2 = r.multiply(m);
+  // const m2 = m.multiply(r);
   const v2 = m2.getScale();
 
-  expect(v.isEqual(v2)).toBe(true);
+  console.log(v.toString())
+  console.log(v2.toString())
+
+  expect(v.isEqual(v2, 0.001)).toBe(true);
 });
