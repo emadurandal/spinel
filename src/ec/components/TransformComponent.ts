@@ -13,11 +13,11 @@ export class TransformComponent extends Component {
     this._transform = new Transform(Vector3.zero(), Quaternion.identity(), Vector3.one());
   }
 
-  setTransform(transform: Transform) {
+  setLocalTransform(transform: Transform) {
     this._transform = transform;
   }
 
-  getTransform() {
+  getLocalTransform() {
     return this._transform.clone();
   }
   
