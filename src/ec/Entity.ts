@@ -1,12 +1,18 @@
+import { TransformComponent } from "./components/TransformComponent.js";
+
 export class Entity {
   private _name: string;
   private _id: number;
 
   private static _entities: Entity[] = [];
 
+  private _transform: TransformComponent;
+
   private constructor(id: number) {
     this._id = id;
     this._name = "Entity_" + id;
+
+    this._transform = TransformComponent._create(this);
   }
 
   getId() {
@@ -19,6 +25,10 @@ export class Entity {
 
   setName(name: string) {
     this._name = name;
+  }
+
+  getTransform(): TransformComponent {
+    return this._transform;
   }
 
   static create(): Entity {
@@ -39,5 +49,4 @@ export class Entity {
   static reset() {
     this._entities = [];
   }
-
 }
