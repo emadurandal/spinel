@@ -45,6 +45,10 @@ export class Vector3 {
     this.v[2] = value;
   }
 
+  get w() {
+    return 1;
+  }
+
   get raw() {
     return this.v;
   }

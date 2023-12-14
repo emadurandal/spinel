@@ -1,3 +1,4 @@
+import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 
 export class Entity {
@@ -7,12 +8,14 @@ export class Entity {
   private static _entities: Entity[] = [];
 
   private _transform: TransformComponent;
+  private _sceneGraph: SceneGraphComponent;
 
   private constructor(id: number) {
     this._id = id;
     this._name = "Entity_" + id;
 
     this._transform = TransformComponent._create(this);
+    this._sceneGraph = SceneGraphComponent._create(this);
   }
 
   getId() {
@@ -29,6 +32,10 @@ export class Entity {
 
   getTransform(): TransformComponent {
     return this._transform;
+  }
+
+  getSceneGraph(): SceneGraphComponent {
+    return this._sceneGraph;
   }
 
   static create(): Entity {
