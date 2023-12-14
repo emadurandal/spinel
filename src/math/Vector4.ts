@@ -1,4 +1,4 @@
-import { Vector3 } from "./Vector3";
+import { Vector3 } from "./Vector3.js";
 
 export class Vector4 {
   private v: Float32Array;

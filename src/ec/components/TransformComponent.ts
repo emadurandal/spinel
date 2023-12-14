@@ -1,4 +1,4 @@
-import { Matrix4 } from "../../index2.js";
+import { Matrix4 } from "../../math/Matrix4.js";
 import { Quaternion } from "../../math/Quaternion.js";
 import { Transform } from "../../math/Transform.js";
 import { Vector3 } from "../../math/Vector3.js";
