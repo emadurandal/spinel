@@ -11,9 +11,9 @@ test("Transform.matrix", () => {
     new Vector3(1, 2, 3)
   );
 
-  const m = t.matrix;
+  const m = t.getMatrix();
   const t2 = t.clone();
-  t2.matrix = m;
+  t2.setMatrix(m);
 
   expect(t.isEqual(t2, 0.001)).toBe(true);
 

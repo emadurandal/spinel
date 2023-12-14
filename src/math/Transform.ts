@@ -16,9 +16,9 @@ export class Transform {
 
   isEqual(transform: Transform, delta: number = Number.EPSILON) {
     return (
-      this._position.isEqual(transform.position, delta) &&
-      this._rotation.isEqual(transform.rotation, delta) &&
-      this._scale.isEqual(transform.scale, delta)
+      this._position.isEqual(transform.getPosition(), delta) &&
+      this._rotation.isEqual(transform.getRotation(), delta) &&
+      this._scale.isEqual(transform.getScale(), delta)
     );
   }
 
@@ -28,45 +28,45 @@ rotation: ${this._rotation.toString()}
 scale: ${this._scale.toString()}`;
   }
 
-  get position() {
-    return this._position.clone();
-  }
-
-  set position(value: Vector3) {
+  setPosition(value: Vector3) {
     this._position = value;
   }
 
-  get rotation() {
+  getPosition() {
+    return this._position.clone();
+  }
+
+  getRotation() {
     return this._rotation.clone();
   }
 
-  set rotation(value: Quaternion) {
+  setRotation(value: Quaternion) {
     this._rotation = value;
   }
 
-  set eulerAngles(value: Vector3) {
+  setEulerAngles(value: Vector3) {
     this._rotation = Quaternion.fromEulerAngles(value);
   }
 
-  get eulerAngles() {
+  getEulerAngles() {
     return this._rotation.toEulerAngles();
   }
   
-  get scale() {
+  getScale() {
     return this._scale.clone();
   }
 
-  set scale(value: Vector3) {
+  setScale(value: Vector3) {
     this._scale = value;
   }
 
-  set matrix(value: Matrix4) {
+  setMatrix(value: Matrix4) {
     this._position = value.getTranslation();
     this._rotation = value.getRotation();
     this._scale = value.getScale();
   }
 
-  get matrix() {
+  getMatrix() {
     const t = Matrix4.translation(this._position);
     const r = Matrix4.fromQuaternion(this._rotation);
     const s = Matrix4.scale(this._scale);
@@ -75,7 +75,7 @@ scale: ${this._scale.toString()}`;
   }
 
   transformVector(vec: Vector4) {
-    return this.matrix.multiplyVector(vec);
+    return this.getMatrix().multiplyVector(vec);
   }
 
   clone(): Transform {
