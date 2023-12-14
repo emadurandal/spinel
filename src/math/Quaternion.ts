@@ -43,9 +43,29 @@ export class Quaternion {
       Math.abs(quat.w - this.w) < delta
     );
   }
+  
+  toString() {
+    return `${this.x}, ${this.y}, ${this.z}, ${this.w}`;
+  }
 
   static identity() {
     return new Quaternion(0, 0, 0, 1);
+  }
+
+  static fromEulerAngles(vec: Vector3) {
+    const sx = Math.sin(vec.x * 0.5);
+    const cx = Math.cos(vec.x * 0.5);
+    const sy = Math.sin(vec.y * 0.5);
+    const cy = Math.cos(vec.y * 0.5);
+    const sz = Math.sin(vec.z * 0.5);
+    const cz = Math.cos(vec.z * 0.5);
+
+    return new Quaternion(
+      sx * cy * cz - cx * sy * sz,
+      cx * sy * cz + sx * cy * sz,
+      cx * cy * sz - sx * sy * cz,
+      cx * cy * cz + sx * sy * sz
+    );
   }
 
   clone(): Quaternion {
@@ -167,35 +187,63 @@ export class Quaternion {
   }
 
   static fromMatrix4(mat: Matrix4) {
-    const tr = mat.m00 + mat.m11 + mat.m22;
 
-    if (tr > 0) {
-      const S = 0.5 / Math.sqrt(tr + 1.0);
-      const x = (mat.m21 - mat.m12) * S;
-      const y = (mat.m02 - mat.m20) * S;
-      const z = (mat.m10 - mat.m01) * S;
+    let sx = Math.hypot(mat.m00, mat.m10, mat.m20);
+    const sy = Math.hypot(mat.m01, mat.m11, mat.m21);
+    const sz = Math.hypot(mat.m02, mat.m12, mat.m22);
+
+    const det = mat.determinant();
+    if (det < 0) {
+      sx = -sx;
+    }
+
+    const m = mat.clone();
+
+    const invSx = 1 / sx;
+    const invSy = 1 / sy;
+    const invSz = 1 / sz;
+
+    m.m00 *= invSx;
+    m.m10 *= invSx;
+    m.m20 *= invSx;
+
+    m.m01 *= invSy;
+    m.m11 *= invSy;
+    m.m21 *= invSy;
+
+    m.m02 *= invSz;
+    m.m12 *= invSz;
+    m.m22 *= invSz;
+
+    const trace = m.m00 + m.m11 + m.m22;
+
+    if (trace > 0) {
+      const S = 0.5 / Math.sqrt(trace + 1.0);
+      const x = (m.m21 - m.m12) * S;
+      const y = (m.m02 - m.m20) * S;
+      const z = (m.m10 - m.m01) * S;
       const w = 0.25 / S;
       return new Quaternion(x, y, z, w);
-    } else if (mat.m00 > mat.m11 && mat.m00 > mat.m22) {
-      const S = Math.sqrt(1.0 + mat.m00 - mat.m11 - mat.m22) * 2;
+    } else if (m.m00 > m.m11 && m.m00 > m.m22) {
+      const S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
       const x = 0.25 * S;
-      const y = (mat.m01 + mat.m10) / S;
-      const z = (mat.m02 + mat.m20) / S;
-      const w = (mat.m21 - mat.m12) / S;
+      const y = (m.m01 + m.m10) / S;
+      const z = (m.m02 + m.m20) / S;
+      const w = (m.m21 - m.m12) / S;
       return new Quaternion(x, y, z, w);
-    } else if (mat.m11 > mat.m22) {
-      const S = Math.sqrt(1.0 + mat.m11 - mat.m00 - mat.m22) * 2;
-      const x = (mat.m01 + mat.m10) / S;
+    } else if (m.m11 > m.m22) {
+      const S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+      const x = (m.m01 + m.m10) / S;
       const y = 0.25 * S;
-      const z = (mat.m12 + mat.m21) / S;
-      const w = (mat.m02 - mat.m20) / S;
+      const z = (m.m12 + m.m21) / S;
+      const w = (m.m02 - m.m20) / S;
       return new Quaternion(x, y, z, w);
     } else {
-      const S = Math.sqrt(1.0 + mat.m22 - mat.m00 - mat.m11) * 2;
-      const x = (mat.m02 + mat.m20) / S;
-      const y = (mat.m12 + mat.m21) / S;
+      const S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+      const x = (m.m02 + m.m20) / S;
+      const y = (m.m12 + m.m21) / S;
       const z = 0.25 * S;
-      const w = (mat.m10 - mat.m01) / S;
+      const w = (m.m10 - m.m01) / S;
       return new Quaternion(x, y, z, w);
     }
   }

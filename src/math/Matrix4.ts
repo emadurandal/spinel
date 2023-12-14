@@ -236,6 +236,68 @@ export class Matrix4 {
     );
   }
 
+  getTranslation() {
+    return new Vector3(this.m03, this.m13, this.m23);
+  }
+
+  getRotation() {
+    return Quaternion.fromMatrix4(this);
+  }
+
+  determinant() {
+		return (
+			this.m30 * (
+				+ this.m03 * this.m12 * this.m21
+				 - this.m02 * this.m13 * this.m21
+				 - this.m03 * this.m11 * this.m22
+				 + this.m01 * this.m13 * this.m22
+				 + this.m02 * this.m11 * this.m23
+				 - this.m01 * this.m12 * this.m23
+			) +
+			this.m31 * (
+				+ this.m00 * this.m12 * this.m23
+				 - this.m00 * this.m13 * this.m22
+				 + this.m03 * this.m10 * this.m22
+				 - this.m02 * this.m10 * this.m23
+				 + this.m02 * this.m13 * this.m20
+				 - this.m03 * this.m12 * this.m20
+			) +
+			this.m32 * (
+				+ this.m00 * this.m13 * this.m21
+				 - this.m00 * this.m11 * this.m23
+				 - this.m03 * this.m10 * this.m21
+				 + this.m01 * this.m10 * this.m23
+				 + this.m03 * this.m11 * this.m20
+				 - this.m01 * this.m13 * this.m20
+			) +
+			this.m33 * (
+				- this.m02 * this.m11 * this.m20
+				 - this.m00 * this.m12 * this.m21
+				 + this.m00 * this.m11 * this.m22
+				 + this.m02 * this.m10 * this.m21
+				 - this.m01 * this.m10 * this.m22
+				 + this.m01 * this.m12 * this.m20
+			)
+		);
+	}
+
+  getScale() {
+    return new Vector3(
+      Math.hypot(this.m00, this.m10, this.m20),
+      Math.hypot(this.m01, this.m11, this.m21),
+      Math.hypot(this.m02, this.m12, this.m22)
+    );
+  }
+
+  clone() {
+    return new Matrix4(
+      this.m00, this.m01, this.m02, this.m03, 
+      this.m10, this.m11, this.m12, this.m13, 
+      this.m20, this.m21, this.m22, this.m23, 
+      this.m30, this.m31, this.m32, this.m33
+    );
+  }
+
   get m00() {
     return this.v[0];
   }

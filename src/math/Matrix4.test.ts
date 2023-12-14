@@ -164,3 +164,30 @@ test("Matrix4.fromQuaternion 2", () => {
   expect(a.isEqual(b, 0.001)).toBe(true);
   expect(a.isEqual(c, 0.001)).toBe(true);
 })
+
+test("Matrix4.getTranslation()", () => {
+  const v = new Vector3(1, 2, 3);
+  const m = Matrix4.translation(v);
+  const v2 = m.getTranslation();
+
+  expect(v.isEqual(v2)).toBe(true);
+});
+
+test("Matrix4.getRotation()", () => {
+  const q = new Quaternion(0.5, 0.5, 0.5, 0.5);
+  const m = Matrix4.fromQuaternion(q);
+  const q2 = m.getRotation();
+
+  expect(q.isEqual(q2)).toBe(true);
+});
+
+test("Matrix4.getScale()", () => {
+  const v = new Vector3(1, 2, 3);
+  const m = Matrix4.scale(v);
+  const r = Matrix4.rotationXYZ(new Vector3(0.1, 0.2, 0.3));
+  const m2 = r.multiply(m);
+  // const m2 = m.multiply(r);
+  const v2 = m2.getScale();
+
+  expect(v.isEqual(v2, 0.001)).toBe(true);
+});

@@ -49,5 +49,10 @@ export class Vector4 {
   get raw() {
     return this.v;
   }
+
+  toString() {
+    return `${this.x}, ${this.y}, ${this.z}, ${this.w}`;
+  }
+
 }
 
