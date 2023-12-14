@@ -45,6 +45,16 @@ export class SceneGraphComponent extends Component {
     }
   }
 
+  setMatrix(mat: Matrix4) {
+    if (this.parent === undefined) {
+      this.entity.getTransform().setLocalMatrix(mat);
+    } else {
+      const parentWorldMatrix = this.parent.getMatrix();
+      const invParentWorldMatrix = parentWorldMatrix.invert();
+      this.entity.getTransform().setLocalMatrix(invParentWorldMatrix.multiply(mat));
+    }
+  }
+
   setPosition(vec: Vector3) {
     if (this.parent === undefined) {
       this.entity.getTransform().setLocalPosition(vec);

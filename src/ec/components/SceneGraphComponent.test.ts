@@ -1,3 +1,4 @@
+import { Matrix4 } from "../../math/Matrix4.js";
 import { Vector3 } from "../../math/Vector3.js";
 import { Entity } from "../Entity.js";
 
@@ -38,6 +39,22 @@ test("SceneGraphComponent Scale", () => {
   const childPos = child.getSceneGraph().getPosition();
 
   expect(childPos.isEqual(new Vector3(20, 0, 0), 0.001)).toBe(true);
+});
+
+test("SceneGraphComponent Matrix", () => {
+  const parent = Entity.create();
+  const child = Entity.create();
+  parent.getSceneGraph().addChild(child.getSceneGraph());
+
+  parent.getTransform().setLocalMatrix(Matrix4.translation(new Vector3(10, 0, 0)));
+  child.getTransform().setLocalMatrix(Matrix4.translation(new Vector3(0, 10, 0)));
+
+  expect(child.getSceneGraph().getMatrix().isEqual(new Matrix4(
+    1, 0, 0, 10,
+    0, 1, 0, 10,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+    ), 0.001)).toBe(true);
 });
 
 test("SceneGraphComponent Position 2", () => {
@@ -90,4 +107,36 @@ test("SceneGraphComponent Scale 2", () => {
 
   expect(parent.getTransform().getLocalScale().isEqual(new Vector3(2, 2, 2), 0.001)).toBe(true);
   expect(child.getTransform().getLocalScale().isEqual(new Vector3(1, 1, 1), 0.001)).toBe(true);
+});
+
+
+test("SceneGraphComponent Matrix 2", () => {
+  const parent = Entity.create();
+  const child = Entity.create();
+  parent.getSceneGraph().addChild(child.getSceneGraph());
+
+  parent.getTransform().setLocalMatrix(Matrix4.translation(new Vector3(10, 0, 0)));
+  child.getTransform().setLocalMatrix(Matrix4.translation(new Vector3(10, 0, 0)));
+
+  expect(child.getSceneGraph().getMatrix().isEqual(new Matrix4(
+    1, 0, 0, 20,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+    ), 0.001)).toBe(true);
+
+  child.getSceneGraph().setMatrix(Matrix4.translation(new Vector3(10, 0, 0)));
+
+  expect(parent.getTransform().getLocalMatrix().isEqual(new Matrix4(
+    1, 0, 0, 10,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+    ), 0.001)).toBe(true);
+  expect(child.getTransform().getLocalMatrix().isEqual(new Matrix4(
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+    ), 0.001)).toBe(true);
 });
