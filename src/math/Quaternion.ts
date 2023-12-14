@@ -146,6 +146,23 @@ export class Quaternion {
     return new Quaternion(x, y, z, w);
   }
 
+  length() {
+    return Math.hypot(this.x, this.y, this.z, this.w);
+  }
+
+  invert(): Quaternion {
+    const norm = this.length();
+    if (norm === 0.0) {
+      return new Quaternion(0, 0, 0, 0);
+    }
+
+    const x = -this.x / norm;
+    const y = -this.y / norm;
+    const z = -this.z / norm;
+    const w = this.w / norm;
+    return new Quaternion(x, y, z, w);
+  }
+
   toEulerAngles() {
     const x = this.x, y = this.y, z = this.z, w = this.w;
 		const x2 = x + x,	y2 = y + y, z2 = z + z;
