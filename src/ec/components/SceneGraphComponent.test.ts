@@ -1,4 +1,6 @@
 import { Matrix4 } from "../../math/Matrix4.js";
+import { Quaternion } from "../../math/Quaternion.js";
+import { Transform } from "../../math/Transform.js";
 import { Vector3 } from "../../math/Vector3.js";
 import { Entity } from "../Entity.js";
 
@@ -55,6 +57,22 @@ test("SceneGraphComponent Matrix", () => {
     0, 0, 1, 0,
     0, 0, 0, 1
     ), 0.001)).toBe(true);
+});
+
+test("SceneGraphComponent Transform", () => {
+  const parent = Entity.create();
+  const child = Entity.create();
+  parent.getSceneGraph().addChild(child.getSceneGraph());
+
+  const t = new Transform(new Vector3(10, 0, 0), Quaternion.identity(), Vector3.one());
+  const t2 = new Transform(new Vector3(0, 10, 0), Quaternion.identity(), Vector3.one());
+
+  parent.getTransform().setLocalTransform(t);
+  child.getTransform().setLocalTransform(t2);
+
+  const childPos = child.getSceneGraph().getTransform().getPosition();
+
+  expect(childPos.isEqual(new Vector3(10, 10, 0), 0.001)).toBe(true);
 });
 
 test("SceneGraphComponent Position 2", () => {
@@ -139,4 +157,25 @@ test("SceneGraphComponent Matrix 2", () => {
     0, 0, 1, 0,
     0, 0, 0, 1
     ), 0.001)).toBe(true);
+});
+
+test("SceneGraphComponent Transform", () => {
+  const parent = Entity.create();
+  const child = Entity.create();
+  parent.getSceneGraph().addChild(child.getSceneGraph());
+
+  const t = new Transform(new Vector3(10, 0, 0), Quaternion.identity(), Vector3.one());
+  const t2 = new Transform(new Vector3(10, 0, 0), Quaternion.identity(), Vector3.one());
+
+  parent.getTransform().setLocalTransform(t);
+  child.getTransform().setLocalTransform(t2);
+
+  const childPos = child.getSceneGraph().getTransform().getPosition();
+
+  expect(childPos.isEqual(new Vector3(20, 0, 0), 0.001)).toBe(true);
+
+  child.getSceneGraph().setTransform(new Transform(new Vector3(10, 0, 0), Quaternion.identity(), Vector3.one()));
+
+  expect(parent.getTransform().getLocalTransform().isEqual(new Transform(new Vector3(10, 0, 0), Quaternion.identity(), Vector3.one()), 0.001)).toBe(true);
+  expect(child.getTransform().getLocalTransform().isEqual(new Transform(new Vector3(0, 0, 0), Quaternion.identity(), Vector3.one()), 0.001)).toBe(true);
 });

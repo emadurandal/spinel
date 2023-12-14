@@ -3,6 +3,7 @@ import { Matrix4 } from "../../math/Matrix4.js";
 import { Quaternion } from "../../math/Quaternion.js";
 import { Component } from "../Component.js";
 import { Entity } from "../Entity.js";
+import { Transform } from "../../math/Transform.js";
 
 export class SceneGraphComponent extends Component {
   private _children: SceneGraphComponent[];
@@ -33,14 +34,34 @@ export class SceneGraphComponent extends Component {
     return this._parent;
   }
 
+  getTransform(): Transform {
+    const localTransform = this.entity.getTransform().getLocalTransform();
+
+    if (this.parent === undefined) {
+      return localTransform;
+    } else {
+      const parentWorldTransform = this.parent.getTransform();
+      return parentWorldTransform.multiply(localTransform);
+    }
+  }
+
+  setTransform(transform: Transform) {
+    if (this.parent === undefined) {
+      this.entity.getTransform().setLocalTransform(transform);
+    } else {
+      const parentWorldTransform = this.parent.getTransform();
+      const invParentWorldTransform = parentWorldTransform.invert();
+      this.entity.getTransform().setLocalTransform(invParentWorldTransform.multiply(transform));
+    }
+  }
+
   getMatrix(): Matrix4 {
     const localMatrix = this.entity.getTransform().getLocalMatrix();
-    const parentSg = this.parent;
 
-    if (parentSg === undefined) {
+    if (this.parent === undefined) {
       return localMatrix;
     } else {
-      const parentWorldMatrix = parentSg.getMatrix();
+      const parentWorldMatrix = this.parent.getMatrix();
       return parentWorldMatrix.multiply(localMatrix);
     }
   }
