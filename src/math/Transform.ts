@@ -29,7 +29,7 @@ scale: ${this._scale.toString()}`;
   }
 
   get position() {
-    return this._position;
+    return this._position.clone();
   }
 
   set position(value: Vector3) {
@@ -37,7 +37,7 @@ scale: ${this._scale.toString()}`;
   }
 
   get rotation() {
-    return this._rotation;
+    return this._rotation.clone();
   }
 
   set rotation(value: Quaternion) {
@@ -53,7 +53,7 @@ scale: ${this._scale.toString()}`;
   }
   
   get scale() {
-    return this._scale;
+    return this._scale.clone();
   }
 
   set scale(value: Vector3) {
