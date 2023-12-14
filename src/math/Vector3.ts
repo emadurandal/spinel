@@ -13,6 +13,14 @@ export class Vector3 {
     );
   }
 
+  static zero() {
+    return new Vector3(0, 0, 0);
+  }
+
+  static one() {
+    return new Vector3(1, 1, 1);
+  }
+
   get x() {
     return this.v[0];
   }

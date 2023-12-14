@@ -13,6 +13,14 @@ export class Vector4 {
       Math.abs(this.w - vec.w) < delta
     );
   }
+  
+  static zero() {
+    return new Vector4(0, 0, 0, 1);
+  }
+
+  static one() {
+    return new Vector4(1, 1, 1, 1);
+  }
 
   get x() {
     return this.v[0];

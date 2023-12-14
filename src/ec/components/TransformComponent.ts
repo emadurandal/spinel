@@ -10,7 +10,7 @@ export class TransformComponent extends Component {
 
   private constructor(entity: Entity) {
     super(entity);
-    this._transform = new Transform(new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 1), new Vector3(1, 1, 1));
+    this._transform = new Transform(Vector3.zero(), Quaternion.identity(), Vector3.one());
   }
 
   setTransform(transform: Transform) {
