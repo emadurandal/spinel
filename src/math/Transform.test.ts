@@ -38,3 +38,35 @@ test("Transform.transformVector", () => {
 
   expect(v2.isEqual(v3, 0.001)).toBe(true);
 });
+
+test("Transform.multiply", () => {
+  const p = new Vector3(1, 2, 3);
+  const r = new Quaternion(0.5, 0.5, 0.5, 0.5);
+  const s = new Vector3(1, 2, 3);
+  const m = Matrix4.translation(p).multiply(Matrix4.fromQuaternion(r)).multiply(Matrix4.scale(s));
+  
+  const p2 = new Vector3(4, 5, 6);
+  const r2 = new Quaternion(-0.5, 0.5, 0.5, 0.5);
+  const s2 = new Vector3(4, 5, 6);
+  const m2 = Matrix4.translation(p2).multiply(Matrix4.fromQuaternion(r2)).multiply(Matrix4.scale(s2));  
+  const m3 = m.multiply(m2);
+
+  const t = new Transform(p, r, s);
+  const t2 = new Transform(p2, r2, s2);
+  const t3 = t.multiply(t2);
+
+  expect(t3.getMatrix().isEqual(m3, 0.001)).toBe(true);
+
+});
+
+test("Transform.invert", () => {
+  const t = new Transform(
+    new Vector3(1, 2, 3),
+    new Quaternion(0.5, 0.5, 0.5, 0.5),
+    new Vector3(1, 2, 3)
+  );
+
+  const t2 = t.invert().invert();
+
+  expect(t.isEqual(t2, 0.001)).toBe(true);
+});

@@ -78,6 +78,16 @@ scale: ${this._scale.toString()}`;
     return this.getMatrix().multiplyVector(vec);
   }
 
+  multiply(transform: Transform) {
+    const mat = this.getMatrix().multiply(transform.getMatrix());
+    return new Transform(mat.getTranslation(), mat.getRotation(), mat.getScale());
+  }
+
+  invert() {
+    const mat = this.getMatrix().invert();
+    return new Transform(mat.getTranslation(), mat.getRotation(), mat.getScale());
+  }
+
   clone(): Transform {
     return new Transform(this._position.clone(), this._rotation.clone(), this._scale.clone());
   }
