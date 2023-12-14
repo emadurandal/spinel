@@ -197,7 +197,51 @@ export class Matrix4 {
     );
   }
 
-  multiplyVector(vec: Vector4) {
+  invert(): Matrix4 {
+    const n00 = this.m00 * this.m11 - this.m01 * this.m10;
+    const n01 = this.m00 * this.m12 - this.m02 * this.m10;
+    const n02 = this.m00 * this.m13 - this.m03 * this.m10;
+    const n03 = this.m01 * this.m12 - this.m02 * this.m11;
+    const n04 = this.m01 * this.m13 - this.m03 * this.m11;
+    const n05 = this.m02 * this.m13 - this.m03 * this.m12;
+    const n06 = this.m20 * this.m31 - this.m21 * this.m30;
+    const n07 = this.m20 * this.m32 - this.m22 * this.m30;
+    const n08 = this.m20 * this.m33 - this.m23 * this.m30;
+    const n09 = this.m21 * this.m32 - this.m22 * this.m31;
+    const n10 = this.m21 * this.m33 - this.m23 * this.m31;
+    const n11 = this.m22 * this.m33 - this.m23 * this.m32;
+
+    const det = n00 * n11 - n01 * n10 + n02 * n09 + n03 * n08 - n04 * n07 + n05 * n06;
+    if (det === 0) {
+      console.error('the determinant is 0!');
+    }
+
+    const m00 = (this.m11 * n11 - this.m12 * n10 + this.m13 * n09) / det;
+    const m01 = (this.m02 * n10 - this.m01 * n11 - this.m03 * n09) / det;
+    const m02 = (this.m31 * n05 - this.m32 * n04 + this.m33 * n03) / det;
+    const m03 = (this.m22 * n04 - this.m21 * n05 - this.m23 * n03) / det;
+    const m10 = (this.m12 * n08 - this.m10 * n11 - this.m13 * n07) / det;
+    const m11 = (this.m00 * n11 - this.m02 * n08 + this.m03 * n07) / det;
+    const m12 = (this.m32 * n02 - this.m30 * n05 - this.m33 * n01) / det;
+    const m13 = (this.m20 * n05 - this.m22 * n02 + this.m23 * n01) / det;
+    const m20 = (this.m10 * n10 - this.m11 * n08 + this.m13 * n06) / det;
+    const m21 = (this.m01 * n08 - this.m00 * n10 - this.m03 * n06) / det;
+    const m22 = (this.m30 * n04 - this.m31 * n02 + this.m33 * n00) / det;
+    const m23 = (this.m21 * n02 - this.m20 * n04 - this.m23 * n00) / det;
+    const m30 = (this.m11 * n07 - this.m10 * n09 - this.m12 * n06) / det;
+    const m31 = (this.m00 * n09 - this.m01 * n07 + this.m02 * n06) / det;
+    const m32 = (this.m31 * n01 - this.m30 * n03 - this.m32 * n00) / det;
+    const m33 = (this.m20 * n03 - this.m21 * n01 + this.m22 * n00) / det;
+
+    return new Matrix4(
+      m00, m01, m02, m03,
+      m10, m11, m12, m13,
+      m20, m21, m22, m23,
+      m30, m31, m32, m33
+    );
+  }
+
+  multiplyVector(vec: Vector3 | Vector4) {
     const x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z + this.m03 * vec.w;
     const y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z + this.m13 * vec.w;
     const z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
