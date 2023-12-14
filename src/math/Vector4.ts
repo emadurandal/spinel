@@ -1,3 +1,5 @@
+import { Vector3 } from "./Vector3";
+
 export class Vector4 {
   private v: Float32Array;
 
@@ -12,6 +14,10 @@ export class Vector4 {
       Math.abs(this.z - vec.z) < delta &&
       Math.abs(this.w - vec.w) < delta
     );
+  }
+
+  toVector3() {
+    return new Vector3(this.x, this.y, this.z);
   }
   
   static zero() {
