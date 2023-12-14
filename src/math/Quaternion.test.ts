@@ -40,3 +40,11 @@ test("Quaternion.fromMatrix4", () => {
 
   expect(q.isEqual(q2)).toBe(true);
 });
+
+test("Quaternion.fromEuler", () => {
+  const v = new Vector3(Math.PI / 2, 0, Math.PI / 2);
+  const q = Quaternion.fromEulerAngles(v);
+  const v2 = q.toEulerAngles();
+
+  expect(v.isEqual(v2, 0.001)).toBe(true);
+});

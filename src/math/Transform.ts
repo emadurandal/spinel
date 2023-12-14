@@ -44,6 +44,14 @@ scale: ${this._scale.toString()}`;
     this._rotation = value;
   }
 
+  set eulerAngles(value: Vector3) {
+    this._rotation = Quaternion.fromEulerAngles(value);
+  }
+
+  get eulerAngles() {
+    return this._rotation.toEulerAngles();
+  }
+  
   get scale() {
     return this._scale;
   }

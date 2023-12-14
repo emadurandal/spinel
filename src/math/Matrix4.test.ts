@@ -189,8 +189,5 @@ test("Matrix4.getScale()", () => {
   // const m2 = m.multiply(r);
   const v2 = m2.getScale();
 
-  console.log(v.toString())
-  console.log(v2.toString())
-
   expect(v.isEqual(v2, 0.001)).toBe(true);
 });

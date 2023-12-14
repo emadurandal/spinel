@@ -52,6 +52,22 @@ export class Quaternion {
     return new Quaternion(0, 0, 0, 1);
   }
 
+  static fromEulerAngles(vec: Vector3) {
+    const sx = Math.sin(vec.x * 0.5);
+    const cx = Math.cos(vec.x * 0.5);
+    const sy = Math.sin(vec.y * 0.5);
+    const cy = Math.cos(vec.y * 0.5);
+    const sz = Math.sin(vec.z * 0.5);
+    const cz = Math.cos(vec.z * 0.5);
+
+    return new Quaternion(
+      sx * cy * cz - cx * sy * sz,
+      cx * sy * cz + sx * cy * sz,
+      cx * cy * sz - sx * sy * cz,
+      cx * cy * cz + sx * sy * sz
+    );
+  }
+
   clone(): Quaternion {
     return new Quaternion(this.x, this.y, this.z, this.w);
   }
