@@ -86,7 +86,7 @@ export class Primitive {
     const gl = Context.gl;
 
     this._setVertexAttrib(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber, [0, 0, 0]);
-    this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 0, 0, 1]);
+    this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 1, 1, 1]);
 
     this._material.useProgram(gl);
     this._material.setUniformValues(gl);
