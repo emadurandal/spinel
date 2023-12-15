@@ -171,6 +171,51 @@ export class Matrix4 {
     );
   }
 
+  static perspective(fovy: number, aspect: number, near: number, far: number) {
+    const f = 1 / Math.tan(fovy / 2);
+    const nf = 1 / (near - far);
+    if (far === Infinity) {
+      return new Matrix4(
+        f / aspect, 0, 0, 0, 
+        0, f, 0, 0, 
+        0, 0, -1, -2 * near, 
+        0, 0, -1, 0
+      );
+    } else {
+      return new Matrix4(
+        f / aspect, 0, 0, 0, 
+        0, f, 0, 0, 
+        0, 0, (far + near) * nf, (2 * far * near) * nf, 
+        0, 0, -1, 0
+      );
+    }
+  }
+
+  static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number) {
+    const rl = 1 / (right - left);
+    const tb = 1 / (top - bottom);
+    const fn = 1 / (far - near);
+    return new Matrix4(
+      2 * rl, 0, 0,  -(right + left) * rl, 
+      0, 2 * tb, 0, -(top + bottom) * tb, 
+      0, 0, -2 * fn, -(far + near) * fn, 
+      0, 0, 0, 1
+    );
+  }
+
+  static lookAt(eye: Vector3, center: Vector3, up: Vector3) {
+    const z = eye.subtract(center).normalize();
+    const x = up.cross(z).normalize();
+    const y = z.cross(x).normalize();
+
+    return new Matrix4(
+      x.x, x.y, x.z, -x.dot(eye),
+      y.x, y.y, y.z, -y.dot(eye),
+      z.x, z.y, z.z, -z.dot(eye),
+      0, 0, 0, 1
+    );
+  }
+
   multiply(mat: Matrix4) {
     const m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20 + this.m03 * mat.m30;
     const m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21 + this.m03 * mat.m31;

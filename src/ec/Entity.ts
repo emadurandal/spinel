@@ -1,6 +1,7 @@
 import { MeshComponent } from "./components/MeshComponent.js";
 import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
+import { CameraComponent } from "./components/CameraComponent.js";
 import type { Mesh } from "../geometry/Mesh.js";
 
 export class Entity {
@@ -12,6 +13,7 @@ export class Entity {
   private _transform: TransformComponent;
   private _sceneGraph: SceneGraphComponent;
   private _mesh?: MeshComponent;
+  private _camera?: CameraComponent;
 
   private constructor(id: number) {
     this._id = id;
@@ -37,6 +39,10 @@ export class Entity {
     this._mesh = MeshComponent._create(this, mesh);
   }
 
+  addCamera(type: "perspective" | "orthographic") {
+    this._camera = CameraComponent._create(this, type);
+  }
+
   getTransform(): TransformComponent {
     return this._transform;
   }
@@ -47,6 +53,10 @@ export class Entity {
 
   getMesh(): MeshComponent | undefined {
     return this._mesh;
+  }
+
+  getCamera(): CameraComponent | undefined {
+    return this._camera;
   }
 
   static create(): Entity {
