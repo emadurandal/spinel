@@ -1,5 +1,7 @@
+import { MeshComponent } from "./components/MeshComponent.js";
 import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
+import type { Mesh } from "../geometry/Mesh.js";
 
 export class Entity {
   private _name: string;
@@ -9,6 +11,7 @@ export class Entity {
 
   private _transform: TransformComponent;
   private _sceneGraph: SceneGraphComponent;
+  private _mesh?: MeshComponent;
 
   private constructor(id: number) {
     this._id = id;
@@ -30,12 +33,20 @@ export class Entity {
     this._name = name;
   }
 
+  addMesh(mesh: Mesh) {
+    this._mesh = MeshComponent._create(mesh);
+  }
+
   getTransform(): TransformComponent {
     return this._transform;
   }
 
   getSceneGraph(): SceneGraphComponent {
     return this._sceneGraph;
+  }
+
+  getMesh(): MeshComponent | undefined {
+    return this._mesh;
   }
 
   static create(): Entity {
@@ -51,6 +62,10 @@ export class Entity {
     }
 
     return this._entities[id];
+  }
+
+  static getAllMeshEntities(): Entity[] {
+    return this._entities.filter(entity => entity.getMesh() !== undefined);
   }
   
   static reset() {
