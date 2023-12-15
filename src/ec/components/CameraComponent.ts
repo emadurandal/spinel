@@ -27,6 +27,7 @@ export class CameraComponent extends Component {
     super(entity);
     this._type = type;
     this._projectionMatrix = Matrix4.identity();
+    this.calculateProjectionMatrix();
   }
 
   getProjectionMatrix() {
