@@ -12,32 +12,6 @@ import { CameraType, PrimitiveMode } from './definitions.js';
 import { CameraComponent } from './ec/components/CameraComponent.js';
 
 export class Gltf2Importer {
-  private static readonly vertexShaderStr = `
-precision highp float;
-
-attribute vec3 a_position;
-attribute vec4 a_color;
-varying vec4 v_color;
-uniform mat4 u_worldMatrix;
-uniform mat4 u_viewMatrix;
-uniform mat4 u_projectionMatrix;
-
-void main(void) {
-  gl_Position = u_projectionMatrix * u_viewMatrix * u_worldMatrix * vec4(a_position, 1.0);
-  v_color = a_color;
-}
-`;
-
-private static readonly fragmentShaderStr = `
-precision highp float;
-
-varying vec4 v_color;
-uniform vec4 u_baseColor;
-
-void main(void) {
-  gl_FragColor = v_color * u_baseColor;
-}
-`;
 
   private constructor() {}
 
@@ -139,7 +113,7 @@ void main(void) {
   }
 
   private static _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
-    const material = new Material(context, Gltf2Importer.vertexShaderStr, Gltf2Importer.fragmentShaderStr);
+    const material = new Material(context);
 
     if (materialIndex >= 0) {
       const materialJson = json.materials[materialIndex];
