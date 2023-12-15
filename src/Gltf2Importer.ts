@@ -4,6 +4,10 @@ import { Material } from './Material.js';
 import { Context } from './Context.js';
 import { Vector4 } from './math/Vector4.js';
 import { Mesh } from './geometry/Mesh.js';
+import { Entity } from './ec/Entity.js';
+import { Vector3 } from './math/Vector3.js';
+import { Quaternion } from './math/Quaternion.js';
+import { Matrix4 } from './math/Matrix4.js';
 
 export class Gltf2Importer {
   private static readonly vertexShaderStr = `
@@ -32,7 +36,7 @@ void main(void) {
 
   private constructor() {}
 
-  static async import(uri: string, context: Context) {
+  static async import(uri: string, context: Context): Promise<Entity[]> {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -46,8 +50,9 @@ void main(void) {
     const arrayBufferBin = await this._loadBin(json, uri);
 
     const meshes = this._loadMesh(arrayBufferBin, json, context);
+    const entities = this._loadNode(json, meshes);
 
-    return meshes;
+    return entities;
   }
 
   private static _arrayBufferToString(arrayBuffer: ArrayBuffer) {
@@ -181,6 +186,57 @@ void main(void) {
     return meshes;
   }
 
+  private static _loadNode(json: Gltf2, meshes: Mesh[]) {
+    const entities: Entity[] = [];
+    for (let node of json.nodes) {
+      const entity = Entity.create();
+      entities.push(entity);
+
+      // transform
+      if (node.matrix != null) {
+        const v = node.matrix;
+        entity.getTransform().setLocalMatrix(new Matrix4(
+          v[0], v[4], v[8], v[12],
+          v[1], v[5], v[9], v[13],
+          v[2], v[6], v[10], v[14],
+          v[3], v[7], v[11], v[15]
+        ));
+      } else {
+        if (node.translation != null) {
+          const v = node.translation;
+          entity.getTransform().setLocalPosition(new Vector3(v[0], v[1], v[2]));
+        }
+        if (node.rotation != null) {
+          const v = node.rotation;
+          entity.getTransform().setLocalRotation(new Quaternion(v[0], v[1], v[2], v[3]));
+        }
+        if (node.scale != null) {
+          const v = node.scale;
+          entity.getTransform().setLocalScale(new Vector3(v[0], v[1], v[2]));
+        }
+      }
+
+      // mesh
+      if (node.mesh != null) {
+        const mesh = meshes[node.mesh];
+        entity.addMesh(mesh);
+      }
+    }
+
+    // make hierarchy
+    for (let nodeIndex = 0; nodeIndex < json.nodes.length; nodeIndex++) {
+      const node = json.nodes[nodeIndex];
+      if (node.children != null) {
+        const parent = entities[nodeIndex];
+        for (let childIndex of node.children) {
+          const child = entities[childIndex];
+          parent.getSceneGraph().addChild(child.getSceneGraph());
+        }
+      }
+    }
+
+    return entities;
+  }
 
   private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
