@@ -1,6 +1,7 @@
 import { Material } from "../Material.js";
 import { Context } from "../Context.js";
 import { Entity } from "../ec/Entity.js";
+import { CameraComponent } from "../ec/components/CameraComponent.js";
 
 export type VertexAttributeSet = {
   position: number[] | Float32Array,
@@ -82,7 +83,10 @@ export class Primitive {
     this._material.useProgram(gl);
     this._material.setUniformValues(gl);
 
+    // WorldMatrix
     gl.uniformMatrix4fv(this.material.program._uniformWorldMatrix, false, entity.getSceneGraph().getMatrix().raw);
+    // ViewMatrix, ProjectionMatrix
+    this.setCameraUniforms(gl);
 
     if (this._indexBuffer != null) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
@@ -91,6 +95,20 @@ export class Primitive {
       gl.drawArrays(gl.TRIANGLES, 0, this.vertexNumber);
     }
 
+  }
+
+  private setCameraUniforms(gl: WebGLRenderingContext) {
+    const cameras = Entity.getAllCameraEntities();
+    if (Entity.getAllCameraEntities().length === 0) {
+      const tempCameraEntity = Entity.create();
+      tempCameraEntity.addCamera("perspective");
+      CameraComponent.activeCamera = tempCameraEntity.getCamera()!;
+    }
+    if (CameraComponent.activeCamera == null) {
+      CameraComponent.activeCamera = cameras[cameras.length - 1].getCamera()!;
+    }
+    gl.uniformMatrix4fv(this.material.program._uniformViewMatrix, false, CameraComponent.activeCamera.getViewMatrix().raw);
+    gl.uniformMatrix4fv(this.material.program._uniformProjectionMatrix, false, CameraComponent.activeCamera.getProjectionMatrix().raw);
   }
 
   get vertexNumber() {

@@ -8,4 +8,6 @@ export interface WebGLProgram {
   _attributeColor: number;
   _uniformBaseColor: WebGLUniformLocation;
   _uniformWorldMatrix: WebGLUniformLocation;
+  _uniformViewMatrix: WebGLUniformLocation;
+  _uniformProjectionMatrix: WebGLUniformLocation;
 }

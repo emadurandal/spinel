@@ -21,6 +21,8 @@ export class CameraComponent extends Component {
   private _fovy = 45;
   private _aspect = 1;
 
+  static activeCamera?: CameraComponent;
+
   private constructor(entity: Entity, type: "perspective" | "orthographic") {
     super(entity);
     this._type = type;

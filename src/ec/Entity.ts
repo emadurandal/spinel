@@ -20,7 +20,7 @@ export class Entity {
     this._name = "Entity_" + id;
 
     this._transform = TransformComponent._create(this);
-    this._sceneGraph = SceneGraphComponent._create(this);
+    this._sceneGraph = SceneGraphComponent._create(this);   
   }
 
   getId() {
@@ -76,6 +76,10 @@ export class Entity {
 
   static getAllMeshEntities(): Entity[] {
     return this._entities.filter(entity => entity.getMesh() !== undefined);
+  }
+
+  static getAllCameraEntities(): Entity[] {
+    return this._entities.filter(entity => entity.getCamera() !== undefined);
   }
   
   static reset() {
