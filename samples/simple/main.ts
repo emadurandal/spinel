@@ -3,14 +3,14 @@ import Spinel from '../../dist/index.js'
 async function main() {
 
   const canvas = document.getElementById('world') as HTMLCanvasElement;
-  const context = new Spinel.Context(canvas);
+  Spinel.Context.setup(canvas);
 
-  const gl = context.gl;
+  const gl = Spinel.Context.gl;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
   const meshEntity = Spinel.Entity.create();
-  const material = new Spinel.Material(context);
+  const material = new Spinel.Material();
   const vertexData = {
     position: new Float32Array([
       -1, -1, 0,
@@ -27,7 +27,7 @@ async function main() {
     ]),
     mode: Spinel.PrimitiveMode.Triangles,
   }
-  const primitive = new Spinel.Primitive(material, context, vertexData);
+  const primitive = new Spinel.Primitive(material, vertexData);
   const mesh = new Spinel.Mesh([primitive]);
   meshEntity.addMesh(mesh);
 

@@ -33,8 +33,8 @@ void main(void) {
   private _program: WebGLProgram;
   private _baseColor = new Vector4(1, 1, 1, 1);
 
-  constructor(context: Context) {
-    const gl = context.gl;
+  constructor() {
+    const gl = Context.gl;
     const vertexShader = this.compileShader(gl, ShaderType.Vertex, Material.vertexShaderStr) as WebGLShader;
     const fragmentShader = this.compileShader(gl, ShaderType.Fragment, Material.fragmentShaderStr) as WebGLShader;
 

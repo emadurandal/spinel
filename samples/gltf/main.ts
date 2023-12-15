@@ -3,10 +3,10 @@ import Spinel from '../../dist/index.js'
 async function main() {
 
   const canvas = document.getElementById('world') as HTMLCanvasElement;
-  const context = new Spinel.Context(canvas);
-  const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf', context);
+  Spinel.Context.setup(canvas);
+  const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf');
 
-  const gl = context.gl;
+  const gl = Spinel.Context.gl;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 

@@ -15,7 +15,7 @@ export class Gltf2Importer {
 
   private constructor() {}
 
-  static async import(uri: string, context: Context): Promise<Entity[]> {
+  static async import(uri: string): Promise<Entity[]> {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -28,7 +28,7 @@ export class Gltf2Importer {
 
     const arrayBufferBin = await this._loadBin(json, uri);
 
-    const meshes = this._loadMesh(arrayBufferBin, json, context);
+    const meshes = this._loadMesh(arrayBufferBin, json);
     const entities = this._loadNode(json, meshes);
 
     return entities;
@@ -112,8 +112,8 @@ export class Gltf2Importer {
     }
   }
 
-  private static _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
-    const material = new Material(context);
+  private static _loadMaterial(json: Gltf2, materialIndex: number) {
+    const material = new Material();
 
     if (materialIndex >= 0) {
       const materialJson = json.materials[materialIndex];
@@ -132,7 +132,7 @@ export class Gltf2Importer {
     return material;
   }
 
-  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
+  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2) {
     const meshes: Mesh[] = []
     for (let meshJson of json.meshes) {
       const primitives: Primitive[] = [];
@@ -143,7 +143,7 @@ export class Gltf2Importer {
         if (primitiveJson.material != null) {
           materialIndex = primitiveJson.material;
         }
-        const material = this._loadMaterial(json, materialIndex, context);
+        const material = this._loadMaterial(json, materialIndex);
 
         const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
         let colorTypedArray: Float32Array | undefined;
@@ -161,7 +161,7 @@ export class Gltf2Importer {
           indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
         }
-        const primitive = new Primitive(material, context, vertexData);
+        const primitive = new Primitive(material, vertexData);
         primitives.push(primitive);
       }
       const mesh = new Mesh(primitives);
