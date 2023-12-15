@@ -55,9 +55,7 @@ void main(void) {
     gl.useProgram(shaderProgram);
 
     shaderProgram._attributePosition = gl.getAttribLocation(shaderProgram, "a_position");
-    gl.enableVertexAttribArray(shaderProgram._attributePosition);
     shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
-    gl.enableVertexAttribArray(shaderProgram._attributeColor);
 
     shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
     shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
