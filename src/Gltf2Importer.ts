@@ -8,6 +8,7 @@ import { Entity } from './ec/Entity.js';
 import { Vector3 } from './math/Vector3.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
+import { PrimitiveMode } from './definitions.js';
 
 export class Gltf2Importer {
   private static readonly vertexShaderStr = `
@@ -177,7 +178,8 @@ void main(void) {
 
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
-          color: colorTypedArray!
+          color: colorTypedArray!,
+          mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
         }
         const primitive = new Primitive(material, context, vertexData);
         primitives.push(primitive);
