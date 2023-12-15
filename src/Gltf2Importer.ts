@@ -6,7 +6,6 @@ import { Vector4 } from './math/Vector4.js';
 import { Mesh } from './geometry/Mesh.js';
 
 export class Gltf2Importer {
-  private static __instance: Gltf2Importer;
   private static readonly vertexShaderStr = `
 precision highp float;
 
@@ -33,7 +32,7 @@ void main(void) {
 
   private constructor() {}
 
-  async import(uri: string, context: Context) {
+  static async import(uri: string, context: Context) {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -51,7 +50,7 @@ void main(void) {
     return meshes;
   }
 
-  private _arrayBufferToString(arrayBuffer: ArrayBuffer) {
+  private static _arrayBufferToString(arrayBuffer: ArrayBuffer) {
     if (typeof TextDecoder !== 'undefined') {
       let textDecoder = new TextDecoder();
       return textDecoder.decode(arrayBuffer);
@@ -66,7 +65,7 @@ void main(void) {
     }
   }
 
-  private async _loadBin(json: Gltf2, uri: string) {
+  private static async _loadBin(json: Gltf2, uri: string) {
 
     //Set the location of gltf file as basePath
     const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
@@ -81,7 +80,7 @@ void main(void) {
     return arrayBufferBin;
   }
 
-  private _componentBytes(componentType: number) {
+  private static _componentBytes(componentType: number) {
     switch (componentType) {
       case 5123: // UNSIGNED_SHORT
         return 2;
@@ -95,7 +94,7 @@ void main(void) {
     }
   }
 
-  private _componentTypedArray(componentType: number) {
+  private static _componentTypedArray(componentType: number) {
     switch (componentType) {
       case 5123: // UNSIGNED_SHORT
         return Uint16Array;
@@ -109,7 +108,7 @@ void main(void) {
     }
   }
 
-  private _componentNum(type: string) {
+  private static _componentNum(type: string) {
     switch (type) {
       case 'SCALAR':
         return 1;
@@ -129,7 +128,7 @@ void main(void) {
     }
   }
 
-  private _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
+  private static _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
     const material = new Material(context, Gltf2Importer.vertexShaderStr, Gltf2Importer.fragmentShaderStr);
 
     if (materialIndex >= 0) {
@@ -149,7 +148,7 @@ void main(void) {
     return material;
   }
 
-  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
+  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
     const meshes: Mesh[] = []
     for (let meshJson of json.meshes) {
       const primitives: Primitive[] = [];
@@ -183,7 +182,7 @@ void main(void) {
   }
 
 
-  private getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
+  private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
     const byteOffsetOfBufferView = bufferView.byteOffset!;
@@ -196,12 +195,5 @@ void main(void) {
     const typedArrayClass = this._componentTypedArray(accessor.componentType);
     const typedArray = new typedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Float32Array;
     return typedArray;
-  }
-
-  static getInstance() {
-    if (!this.__instance) {
-      this.__instance = new Gltf2Importer();
-    }
-    return this.__instance;
   }
 }
