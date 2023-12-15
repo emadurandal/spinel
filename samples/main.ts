@@ -11,8 +11,8 @@ async function main() {
   gl.enable(gl.DEPTH_TEST);
 
   const cameraEntity = Spinel.Entity.create();
-  cameraEntity.addCamera("perspective");
   cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 15));
+  cameraEntity.addCamera(Spinel.CameraType.Perspective);
   const meshEntities = Spinel.Entity.getAllMeshEntities();
 
   const draw = () => {

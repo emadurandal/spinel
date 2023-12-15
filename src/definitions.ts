@@ -11,3 +11,9 @@ export interface WebGLProgram {
   _uniformViewMatrix: WebGLUniformLocation;
   _uniformProjectionMatrix: WebGLUniformLocation;
 }
+
+export const CameraType = {
+  Perspective: 0,
+  Orthographic: 1,
+} as const;
+export type CameraType= typeof CameraType[keyof typeof CameraType];

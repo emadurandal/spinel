@@ -1,3 +1,4 @@
+import { CameraType } from "../../definitions.js";
 import { Matrix4 } from "../../math/Matrix4.js";
 import { Vector3 } from "../../math/Vector3.js";
 import { Component } from "../Component.js";
@@ -5,7 +6,7 @@ import { Entity } from "../Entity.js";
 
 export class CameraComponent extends Component {
   private _projectionMatrix: Matrix4;
-  private _type: "perspective" | "orthographic" = "perspective";
+  private _type: CameraType;
 
   // common camera properties
   private _near = 0.1;
@@ -23,7 +24,7 @@ export class CameraComponent extends Component {
 
   static activeCamera?: CameraComponent;
 
-  private constructor(entity: Entity, type: "perspective" | "orthographic") {
+  private constructor(entity: Entity, type: CameraType) {
     super(entity);
     this._type = type;
     this._projectionMatrix = Matrix4.identity();
@@ -44,9 +45,9 @@ export class CameraComponent extends Component {
   }
 
   calculateProjectionMatrix() {
-    if (this._type === "perspective") {
+    if (this._type === CameraType.Perspective) {
       this._projectionMatrix = Matrix4.perspective(this._fovy, this._aspect, this._near, this._far);
-    } else if (this._type === "orthographic") {
+    } else if (this._type === CameraType.Orthographic) {
       this._projectionMatrix = Matrix4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
     } else {
       throw new Error("Unknown camera type");
@@ -141,12 +142,12 @@ export class CameraComponent extends Component {
     return this._type;
   }
 
-  set cameraType(cameraType: "perspective" | "orthographic") {
+  set cameraType(cameraType: CameraType) {
     this._type = cameraType;
     this.calculateProjectionMatrix();
   }
 
-  static _create(entity: Entity, type: "perspective" | "orthographic") {
+  static _create(entity: Entity, type: CameraType) {
     return new CameraComponent(entity, type);
   }
 }

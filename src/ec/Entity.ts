@@ -3,6 +3,7 @@ import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { CameraComponent } from "./components/CameraComponent.js";
 import type { Mesh } from "../geometry/Mesh.js";
+import { CameraType } from "../definitions.js";
 
 export class Entity {
   private _name: string;
@@ -39,7 +40,7 @@ export class Entity {
     this._mesh = MeshComponent._create(this, mesh);
   }
 
-  addCamera(type: "perspective" | "orthographic") {
+  addCamera(type: CameraType) {
     this._camera = CameraComponent._create(this, type);
   }
 

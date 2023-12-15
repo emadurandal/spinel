@@ -2,6 +2,7 @@ import { Material } from "../Material.js";
 import { Context } from "../Context.js";
 import { Entity } from "../ec/Entity.js";
 import { CameraComponent } from "../ec/components/CameraComponent.js";
+import { CameraType } from "../definitions.js";
 
 export type VertexAttributeSet = {
   position: number[] | Float32Array,
@@ -101,7 +102,7 @@ export class Primitive {
     const cameras = Entity.getAllCameraEntities();
     if (Entity.getAllCameraEntities().length === 0) {
       const tempCameraEntity = Entity.create();
-      tempCameraEntity.addCamera("perspective");
+      tempCameraEntity.addCamera(CameraType.Perspective);
       CameraComponent.activeCamera = tempCameraEntity.getCamera()!;
     }
     if (CameraComponent.activeCamera == null) {
