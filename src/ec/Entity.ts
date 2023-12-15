@@ -34,7 +34,7 @@ export class Entity {
   }
 
   addMesh(mesh: Mesh) {
-    this._mesh = MeshComponent._create(mesh);
+    this._mesh = MeshComponent._create(this, mesh);
   }
 
   getTransform(): TransformComponent {

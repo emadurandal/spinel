@@ -1,5 +1,6 @@
 import { Material } from "../Material.js";
 import { Context } from "../Context.js";
+import { Entity } from "../ec/Entity.js";
 
 export type VertexAttributeSet = {
   position: number[] | Float32Array,
@@ -72,7 +73,7 @@ export class Primitive {
     }
   }
 
-  draw() {
+  draw(entity: Entity) {
     const gl = this._context.gl;
 
     this._setVertexAttribPointer(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber);
@@ -80,6 +81,8 @@ export class Primitive {
 
     this._material.useProgram(gl);
     this._material.setUniformValues(gl);
+
+    gl.uniformMatrix4fv(this.material.program._uniformWorldMatrix, false, entity.getSceneGraph().getMatrix().raw);
 
     if (this._indexBuffer != null) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);

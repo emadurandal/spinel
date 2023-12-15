@@ -1,3 +1,4 @@
+import { Entity } from "../ec/Entity.js";
 import { Primitive } from "./Primitive.js";
 
 export class Mesh {
@@ -7,9 +8,9 @@ export class Mesh {
     this._primitives = primitives;
   }
 
-  draw() {
+  draw(entity: Entity) {
     for (let primitive of this._primitives) {
-      primitive.draw();
+      primitive.draw(entity);
     }
   }
 }

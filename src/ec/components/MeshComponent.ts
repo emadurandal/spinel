@@ -1,14 +1,17 @@
-import { Mesh } from "../../geometry/Mesh";
+import { Mesh } from "../../geometry/Mesh.js";
+import { Component } from "../Component.js";
+import { Entity } from "../Entity.js";
 
-export class MeshComponent {
+export class MeshComponent extends Component {
   private _mesh: Mesh;
 
-  private constructor(mesh: Mesh) {
+  private constructor(entity: Entity, mesh: Mesh) {
+    super(entity);
     this._mesh = mesh;
   }
 
   draw() {
-    this._mesh.draw();
+    this._mesh.draw(this.entity);
   }
 
   /**
@@ -16,7 +19,7 @@ export class MeshComponent {
    * @param mesh 
    * @returns a Mesh component
    */
-  static _create(mesh: Mesh) {
-    return new MeshComponent(mesh);
+  static _create(entity: Entity, mesh: Mesh) {
+    return new MeshComponent(entity, mesh);
   }
 }
