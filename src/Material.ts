@@ -34,6 +34,8 @@ export class Material {
 
     shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
     shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
+    shaderProgram._uniformViewMatrix = gl.getUniformLocation(shaderProgram, 'u_viewMatrix')!;
+    shaderProgram._uniformProjectionMatrix = gl.getUniformLocation(shaderProgram, 'u_projectionMatrix')!;
 
     this._program = shaderProgram;
 
@@ -84,6 +86,5 @@ export class Material {
   useProgram(gl: WebGLRenderingContext) {
     gl.useProgram(this._program);
   }
-
 }
 

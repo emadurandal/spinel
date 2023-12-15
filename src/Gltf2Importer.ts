@@ -8,6 +8,8 @@ import { Entity } from './ec/Entity.js';
 import { Vector3 } from './math/Vector3.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
+import { CameraType, PrimitiveMode } from './definitions.js';
+import { CameraComponent } from './ec/components/CameraComponent.js';
 
 export class Gltf2Importer {
   private static readonly vertexShaderStr = `
@@ -17,9 +19,11 @@ attribute vec3 a_position;
 attribute vec4 a_color;
 varying vec4 v_color;
 uniform mat4 u_worldMatrix;
+uniform mat4 u_viewMatrix;
+uniform mat4 u_projectionMatrix;
 
 void main(void) {
-  gl_Position = u_worldMatrix * vec4(a_position, 1.0);
+  gl_Position = u_projectionMatrix * u_viewMatrix * u_worldMatrix * vec4(a_position, 1.0);
   v_color = a_color;
 }
 `;
@@ -168,14 +172,20 @@ void main(void) {
         const material = this._loadMaterial(json, materialIndex, context);
 
         const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
-        let colorTypedArray: Float32Array;
+        let colorTypedArray: Float32Array | undefined;
         if (attributes.COLOR_0) {
           colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
         }
 
+        let indicesTypedArray: Uint16Array | Uint32Array | undefined;
+        if (primitiveJson.indices != null) {
+          indicesTypedArray = this.getIndices(json, primitiveJson.indices, arrayBufferBin);
+        }
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
-          color: colorTypedArray!
+          color: colorTypedArray,
+          indices: indicesTypedArray,
+          mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
         }
         const primitive = new Primitive(material, context, vertexData);
         primitives.push(primitive);
@@ -222,6 +232,31 @@ void main(void) {
         const mesh = meshes[node.mesh];
         entity.addMesh(mesh);
       }
+
+      // camera
+      if (node.camera != null) {
+        const cameraJson = json.cameras[node.camera];
+        cameraJson.type
+        if (cameraJson.type === 'perspective') {
+          const cameraComponent = entity.addCamera(CameraType.Perspective);
+          cameraComponent.fovy = cameraJson.perspective!.yfov;
+          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? 1;
+          cameraComponent.near = cameraJson.perspective!.znear;
+          cameraComponent.far = cameraJson.perspective!.zfar ?? Infinity;
+          if (CameraComponent.activeCamera == null) {
+            CameraComponent.activeCamera = cameraComponent;
+          }
+        } else {
+          const cameraComponent = entity.addCamera(CameraType.Orthographic);
+          cameraComponent.xmag = cameraJson.orthographic!.xmag;
+          cameraComponent.ymag = cameraJson.orthographic!.ymag;
+          cameraComponent.near = cameraJson.orthographic!.znear;
+          cameraComponent.far = cameraJson.orthographic!.zfar;
+          if (CameraComponent.activeCamera == null) {
+            CameraComponent.activeCamera = cameraComponent;
+          }
+        }
+      }
     }
 
     // make hierarchy
@@ -237,6 +272,21 @@ void main(void) {
     }
 
     return entities;
+  }
+  
+  private static getIndices(json: Gltf2, indicesIndex: number, arrayBufferBin: ArrayBuffer) {
+    const accessor = json.accessors[indicesIndex] as Gltf2Accessor;
+    const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
+    const byteOffsetOfBufferView = bufferView.byteOffset!;
+    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
+    const componentBytes = this._componentBytes(accessor.componentType);
+    const componentNum = this._componentNum(accessor.type);
+    const count = accessor.count;
+    const typedArrayComponentCount = componentNum * count;
+    const typedArrayClass = this._componentTypedArray(accessor.componentType);
+    const typedArray = new typedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Uint16Array | Uint32Array;
+    return typedArray;
   }
 
   private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {

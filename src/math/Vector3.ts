@@ -13,6 +13,35 @@ export class Vector3 {
     );
   }
 
+  add(vec: Vector3) {
+    return new Vector3(this.x + vec.x, this.y + vec.y, this.z + vec.z);
+  }
+
+  subtract(vec: Vector3) {
+    return new Vector3(this.x - vec.x, this.y - vec.y, this.z - vec.z);
+  }
+
+  dot(vec: Vector3) {
+    return this.x * vec.x + this.y * vec.y + this.z * vec.z;
+  }
+
+  length() {
+    return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+  }
+
+  cross(vec: Vector3) {
+    return new Vector3(
+      this.y * vec.z - this.z * vec.y,
+      this.z * vec.x - this.x * vec.z,
+      this.x * vec.y - this.y * vec.x
+    );
+  }
+
+  normalize() {
+    const length = this.length();
+    return new Vector3(this.x / length, this.y / length, this.z / length);
+  }
+
   static zero() {
     return new Vector3(0, 0, 0);
   }

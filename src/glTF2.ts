@@ -128,7 +128,7 @@ export type Gltf2CameraPerspective = {
 export type Gltf2Camera = {
   orthographic?: Gltf2CameraOrthographic,
   perspective?: Gltf2CameraPerspective,
-  type: string,
+  type: "perspective" | "orthographic",
   name?: string,
   extensions?: Object,
   extras?: any

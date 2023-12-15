@@ -1,7 +1,9 @@
 import { MeshComponent } from "./components/MeshComponent.js";
 import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
+import { CameraComponent } from "./components/CameraComponent.js";
 import type { Mesh } from "../geometry/Mesh.js";
+import { CameraType } from "../definitions.js";
 
 export class Entity {
   private _name: string;
@@ -12,13 +14,14 @@ export class Entity {
   private _transform: TransformComponent;
   private _sceneGraph: SceneGraphComponent;
   private _mesh?: MeshComponent;
+  private _camera?: CameraComponent;
 
   private constructor(id: number) {
     this._id = id;
     this._name = "Entity_" + id;
 
     this._transform = TransformComponent._create(this);
-    this._sceneGraph = SceneGraphComponent._create(this);
+    this._sceneGraph = SceneGraphComponent._create(this);   
   }
 
   getId() {
@@ -33,8 +36,14 @@ export class Entity {
     this._name = name;
   }
 
-  addMesh(mesh: Mesh) {
+  addMesh(mesh: Mesh): MeshComponent {
     this._mesh = MeshComponent._create(this, mesh);
+    return this._mesh;
+  }
+
+  addCamera(type: CameraType): CameraComponent {
+    this._camera = CameraComponent._create(this, type);
+    return this._camera;
   }
 
   getTransform(): TransformComponent {
@@ -47,6 +56,10 @@ export class Entity {
 
   getMesh(): MeshComponent | undefined {
     return this._mesh;
+  }
+
+  getCamera(): CameraComponent | undefined {
+    return this._camera;
   }
 
   static create(): Entity {
@@ -66,6 +79,10 @@ export class Entity {
 
   static getAllMeshEntities(): Entity[] {
     return this._entities.filter(entity => entity.getMesh() !== undefined);
+  }
+
+  static getAllCameraEntities(): Entity[] {
+    return this._entities.filter(entity => entity.getCamera() !== undefined);
   }
   
   static reset() {
