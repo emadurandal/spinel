@@ -8,7 +8,8 @@ import { Entity } from './ec/Entity.js';
 import { Vector3 } from './math/Vector3.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
-import { PrimitiveMode } from './definitions.js';
+import { CameraType, PrimitiveMode } from './definitions.js';
+import { CameraComponent } from './ec/components/CameraComponent.js';
 
 export class Gltf2Importer {
   private static readonly vertexShaderStr = `
@@ -230,6 +231,31 @@ void main(void) {
       if (node.mesh != null) {
         const mesh = meshes[node.mesh];
         entity.addMesh(mesh);
+      }
+
+      // camera
+      if (node.camera != null) {
+        const cameraJson = json.cameras[node.camera];
+        cameraJson.type
+        if (cameraJson.type === 'perspective') {
+          const cameraComponent = entity.addCamera(CameraType.Perspective);
+          cameraComponent.fovy = cameraJson.perspective!.yfov;
+          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? 1;
+          cameraComponent.near = cameraJson.perspective!.znear;
+          cameraComponent.far = cameraJson.perspective!.zfar ?? Infinity;
+          if (CameraComponent.activeCamera == null) {
+            CameraComponent.activeCamera = cameraComponent;
+          }
+        } else {
+          const cameraComponent = entity.addCamera(CameraType.Orthographic);
+          cameraComponent.xmag = cameraJson.orthographic!.xmag;
+          cameraComponent.ymag = cameraJson.orthographic!.ymag;
+          cameraComponent.near = cameraJson.orthographic!.znear;
+          cameraComponent.far = cameraJson.orthographic!.zfar;
+          if (CameraComponent.activeCamera == null) {
+            CameraComponent.activeCamera = cameraComponent;
+          }
+        }
       }
     }
 

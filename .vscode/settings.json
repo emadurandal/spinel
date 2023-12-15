@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
-        "fovy"
+        "fovy",
+        "xmag",
+        "yfov",
+        "ymag",
+        "zfar",
+        "znear"
     ]
 }

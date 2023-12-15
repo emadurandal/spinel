@@ -36,12 +36,14 @@ export class Entity {
     this._name = name;
   }
 
-  addMesh(mesh: Mesh) {
+  addMesh(mesh: Mesh): MeshComponent {
     this._mesh = MeshComponent._create(this, mesh);
+    return this._mesh;
   }
 
-  addCamera(type: CameraType) {
+  addCamera(type: CameraType): CameraComponent {
     this._camera = CameraComponent._create(this, type);
+    return this._camera;
   }
 
   getTransform(): TransformComponent {
