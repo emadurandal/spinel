@@ -1,9 +1,9 @@
-import { Primitive, VertexAttributeSet } from './Primitive.js';
+import { Primitive, VertexAttributeSet } from './geometry/Primitive.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import { Material } from './Material.js';
 import { Context } from './Context.js';
 import { Vector4 } from './math/Vector4.js';
-import { Mesh } from './Mesh.js';
+import { Mesh } from './geometry/Mesh.js';
 
 export class Gltf2Importer {
   private static __instance: Gltf2Importer;

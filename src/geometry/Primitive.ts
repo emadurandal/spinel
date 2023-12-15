@@ -1,5 +1,5 @@
-import { Material } from "./Material.js";
-import { Context } from "./Context.js";
+import { Material } from "../Material.js";
+import { Context } from "../Context.js";
 
 export type VertexAttributeSet = {
   position: number[] | Float32Array,
