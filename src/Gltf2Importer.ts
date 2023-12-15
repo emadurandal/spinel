@@ -1,21 +1,25 @@
-import { Primitive, VertexAttributeSet } from './Primitive.js';
+import { Primitive, VertexAttributeSet } from './geometry/Primitive.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import { Material } from './Material.js';
 import { Context } from './Context.js';
 import { Vector4 } from './math/Vector4.js';
-import { Mesh } from './Mesh.js';
+import { Mesh } from './geometry/Mesh.js';
+import { Entity } from './ec/Entity.js';
+import { Vector3 } from './math/Vector3.js';
+import { Quaternion } from './math/Quaternion.js';
+import { Matrix4 } from './math/Matrix4.js';
 
 export class Gltf2Importer {
-  private static __instance: Gltf2Importer;
   private static readonly vertexShaderStr = `
 precision highp float;
 
 attribute vec3 a_position;
 attribute vec4 a_color;
 varying vec4 v_color;
+uniform mat4 u_worldMatrix;
 
 void main(void) {
-  gl_Position = vec4(a_position, 1.0);
+  gl_Position = u_worldMatrix * vec4(a_position, 1.0);
   v_color = a_color;
 }
 `;
@@ -33,7 +37,7 @@ void main(void) {
 
   private constructor() {}
 
-  async import(uri: string, context: Context) {
+  static async import(uri: string, context: Context): Promise<Entity[]> {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -47,11 +51,12 @@ void main(void) {
     const arrayBufferBin = await this._loadBin(json, uri);
 
     const meshes = this._loadMesh(arrayBufferBin, json, context);
+    const entities = this._loadNode(json, meshes);
 
-    return meshes;
+    return entities;
   }
 
-  private _arrayBufferToString(arrayBuffer: ArrayBuffer) {
+  private static _arrayBufferToString(arrayBuffer: ArrayBuffer) {
     if (typeof TextDecoder !== 'undefined') {
       let textDecoder = new TextDecoder();
       return textDecoder.decode(arrayBuffer);
@@ -66,7 +71,7 @@ void main(void) {
     }
   }
 
-  private async _loadBin(json: Gltf2, uri: string) {
+  private static async _loadBin(json: Gltf2, uri: string) {
 
     //Set the location of gltf file as basePath
     const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
@@ -81,7 +86,7 @@ void main(void) {
     return arrayBufferBin;
   }
 
-  private _componentBytes(componentType: number) {
+  private static _componentBytes(componentType: number) {
     switch (componentType) {
       case 5123: // UNSIGNED_SHORT
         return 2;
@@ -95,7 +100,7 @@ void main(void) {
     }
   }
 
-  private _componentTypedArray(componentType: number) {
+  private static _componentTypedArray(componentType: number) {
     switch (componentType) {
       case 5123: // UNSIGNED_SHORT
         return Uint16Array;
@@ -109,7 +114,7 @@ void main(void) {
     }
   }
 
-  private _componentNum(type: string) {
+  private static _componentNum(type: string) {
     switch (type) {
       case 'SCALAR':
         return 1;
@@ -129,7 +134,7 @@ void main(void) {
     }
   }
 
-  private _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
+  private static _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
     const material = new Material(context, Gltf2Importer.vertexShaderStr, Gltf2Importer.fragmentShaderStr);
 
     if (materialIndex >= 0) {
@@ -149,7 +154,7 @@ void main(void) {
     return material;
   }
 
-  private _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
+  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
     const meshes: Mesh[] = []
     for (let meshJson of json.meshes) {
       const primitives: Primitive[] = [];
@@ -182,8 +187,59 @@ void main(void) {
     return meshes;
   }
 
+  private static _loadNode(json: Gltf2, meshes: Mesh[]) {
+    const entities: Entity[] = [];
+    for (let node of json.nodes) {
+      const entity = Entity.create();
+      entities.push(entity);
 
-  private getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
+      // transform
+      if (node.matrix != null) {
+        const v = node.matrix;
+        entity.getTransform().setLocalMatrix(new Matrix4(
+          v[0], v[4], v[8], v[12],
+          v[1], v[5], v[9], v[13],
+          v[2], v[6], v[10], v[14],
+          v[3], v[7], v[11], v[15]
+        ));
+      } else {
+        if (node.translation != null) {
+          const v = node.translation;
+          entity.getTransform().setLocalPosition(new Vector3(v[0], v[1], v[2]));
+        }
+        if (node.rotation != null) {
+          const v = node.rotation;
+          entity.getTransform().setLocalRotation(new Quaternion(v[0], v[1], v[2], v[3]));
+        }
+        if (node.scale != null) {
+          const v = node.scale;
+          entity.getTransform().setLocalScale(new Vector3(v[0], v[1], v[2]));
+        }
+      }
+
+      // mesh
+      if (node.mesh != null) {
+        const mesh = meshes[node.mesh];
+        entity.addMesh(mesh);
+      }
+    }
+
+    // make hierarchy
+    for (let nodeIndex = 0; nodeIndex < json.nodes.length; nodeIndex++) {
+      const node = json.nodes[nodeIndex];
+      if (node.children != null) {
+        const parent = entities[nodeIndex];
+        for (let childIndex of node.children) {
+          const child = entities[childIndex];
+          parent.getSceneGraph().addChild(child.getSceneGraph());
+        }
+      }
+    }
+
+    return entities;
+  }
+
+  private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
     const byteOffsetOfBufferView = bufferView.byteOffset!;
@@ -196,12 +252,5 @@ void main(void) {
     const typedArrayClass = this._componentTypedArray(accessor.componentType);
     const typedArray = new typedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Float32Array;
     return typedArray;
-  }
-
-  static getInstance() {
-    if (!this.__instance) {
-      this.__instance = new Gltf2Importer();
-    }
-    return this.__instance;
   }
 }

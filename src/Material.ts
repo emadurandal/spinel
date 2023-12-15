@@ -33,6 +33,7 @@ export class Material {
     gl.enableVertexAttribArray(shaderProgram._attributeColor);
 
     shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
+    shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
 
     this._program = shaderProgram;
 

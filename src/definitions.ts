@@ -7,4 +7,5 @@ export interface WebGLProgram {
   _attributePosition: number;
   _attributeColor: number;
   _uniformBaseColor: WebGLUniformLocation;
+  _uniformWorldMatrix: WebGLUniformLocation;
 }
