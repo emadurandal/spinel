@@ -1,3 +1,4 @@
+import { Context } from "../../Context.js";
 import { CameraType } from "../../definitions.js";
 import { Matrix4 } from "../../math/Matrix4.js";
 import { Vector3 } from "../../math/Vector3.js";
@@ -20,7 +21,7 @@ export class CameraComponent extends Component {
 
   // perspective camera properties
   private _fovy = 45;
-  private _aspect = 1;
+  private _aspect = -1;
 
   static activeCamera?: CameraComponent;
 
@@ -28,7 +29,7 @@ export class CameraComponent extends Component {
     super(entity);
     this._type = type;
     this._projectionMatrix = Matrix4.identity();
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   getProjectionMatrix() {
@@ -44,9 +45,13 @@ export class CameraComponent extends Component {
     return lookAtMatrix.multiply(this.entity.getSceneGraph().getMatrix().invert());
   }
 
-  calculateProjectionMatrix() {
+  private _calculateProjectionMatrix() {
     if (this._type === CameraType.Perspective) {
-      this._projectionMatrix = Matrix4.perspective(this._fovy, this._aspect, this._near, this._far);
+      let aspect = this._aspect;
+      if (aspect < 0) {
+        aspect = Context.canvasAspectRatio;
+      }
+      this._projectionMatrix = Matrix4.perspective(this._fovy, aspect, this._near, this._far);
     } else if (this._type === CameraType.Orthographic) {
       this._projectionMatrix = Matrix4.orthographic(this._left, this._right, this._bottom, this._top, this._near, this._far);
     } else {
@@ -60,7 +65,7 @@ export class CameraComponent extends Component {
 
   set fovy(fovy: number) {
     this._fovy = fovy;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get near() {
@@ -69,7 +74,7 @@ export class CameraComponent extends Component {
 
   set near(near: number) {
     this._near = near;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get far() {
@@ -78,7 +83,7 @@ export class CameraComponent extends Component {
 
   set far(far: number) {
     this._far = far;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get aspect() {
@@ -87,7 +92,7 @@ export class CameraComponent extends Component {
 
   set aspect(aspect: number) {
     this._aspect = aspect;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get left() {
@@ -96,7 +101,7 @@ export class CameraComponent extends Component {
 
   set left(left: number) {
     this._left = left;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get right() {
@@ -105,7 +110,7 @@ export class CameraComponent extends Component {
 
   set right(right: number) {
     this._right = right;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get bottom() {
@@ -114,7 +119,7 @@ export class CameraComponent extends Component {
 
   set bottom(bottom: number) {
     this._bottom = bottom;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get top() {
@@ -123,19 +128,19 @@ export class CameraComponent extends Component {
 
   set top(top: number) {
     this._top = top;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   set xmag(xmag: number) {
     this._left = -xmag;
     this._right = xmag;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   set ymag(ymag: number) {
     this._bottom = -ymag;
     this._top = ymag;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   get cameraType() {
@@ -144,7 +149,7 @@ export class CameraComponent extends Component {
 
   set cameraType(cameraType: CameraType) {
     this._type = cameraType;
-    this.calculateProjectionMatrix();
+    this._calculateProjectionMatrix();
   }
 
   static _create(entity: Entity, type: CameraType) {

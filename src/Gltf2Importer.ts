@@ -214,7 +214,7 @@ export class Gltf2Importer {
         if (cameraJson.type === 'perspective') {
           const cameraComponent = entity.addCamera(CameraType.Perspective);
           cameraComponent.fovy = cameraJson.perspective!.yfov;
-          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? 1;
+          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? -1;
           cameraComponent.near = cameraJson.perspective!.znear;
           cameraComponent.far = cameraJson.perspective!.zfar ?? Infinity;
           if (CameraComponent.activeCamera == null) {

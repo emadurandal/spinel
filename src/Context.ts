@@ -22,7 +22,7 @@ export class Context {
     return this._gl.canvas.height;
   }
 
-  static get aspect() {
+  static get canvasAspectRatio() {
     return this.canvasWidth / this.canvasHeight;
   }
 
