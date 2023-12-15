@@ -9,7 +9,7 @@ export type VertexAttributeSet = {
   color?: number[] | Float32Array,
   normal?: number[] | Float32Array,
   texcoord?: number[] | Float32Array,
-  indices?: number[] | Uint16Array,
+  indices?: Uint16Array | Uint32Array,
   mode: PrimitiveMode,
 }
 
@@ -17,6 +17,7 @@ export class Primitive {
   private _positionBuffer: WebGLBuffer;
   private _colorBuffer: WebGLBuffer;
   private _indexBuffer?: WebGLBuffer;
+  private _indexType: 5123 | 5125 = 5123; // gl.UNSIGNED_SHORT | gl.UNSIGNED_INT
   private _mode: PrimitiveMode = PrimitiveMode.Triangles;
 
   private _vertexNumber = 0;
@@ -60,12 +61,12 @@ export class Primitive {
     return buffer;
   }
 
-  private _setupIndexBuffer(indicesArray: number[] | Uint16Array) {
+  private _setupIndexBuffer(indicesArray: Uint16Array | Uint32Array) {
     const gl = this._context.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-    const typedArray = (indicesArray.constructor === Uint16Array) ? indicesArray as Uint16Array : new Uint16Array(indicesArray);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, typedArray, gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
+    this._indexType = (indicesArray.constructor === Uint16Array) ? gl.UNSIGNED_SHORT : gl.UNSIGNED_INT;
     return buffer;
   }
 
@@ -95,7 +96,7 @@ export class Primitive {
 
     if (this._indexBuffer != null) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
-      gl.drawElements(this._mode, this._indexNumber, gl.UNSIGNED_INT, 0);
+      gl.drawElements(this._mode, this._indexNumber, this._indexType, 0);
     } else {
       gl.drawArrays(this._mode, 0, this.vertexNumber);
     }

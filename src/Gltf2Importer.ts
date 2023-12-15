@@ -171,14 +171,19 @@ void main(void) {
         const material = this._loadMaterial(json, materialIndex, context);
 
         const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
-        let colorTypedArray: Float32Array;
+        let colorTypedArray: Float32Array | undefined;
         if (attributes.COLOR_0) {
           colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
         }
 
+        let indicesTypedArray: Uint16Array | Uint32Array | undefined;
+        if (primitiveJson.indices != null) {
+          indicesTypedArray = this.getIndices(json, primitiveJson.indices, arrayBufferBin);
+        }
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
-          color: colorTypedArray!,
+          color: colorTypedArray,
+          indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
         }
         const primitive = new Primitive(material, context, vertexData);
@@ -241,6 +246,21 @@ void main(void) {
     }
 
     return entities;
+  }
+  
+  private static getIndices(json: Gltf2, indicesIndex: number, arrayBufferBin: ArrayBuffer) {
+    const accessor = json.accessors[indicesIndex] as Gltf2Accessor;
+    const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
+    const byteOffsetOfBufferView = bufferView.byteOffset!;
+    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
+    const componentBytes = this._componentBytes(accessor.componentType);
+    const componentNum = this._componentNum(accessor.type);
+    const count = accessor.count;
+    const typedArrayComponentCount = componentNum * count;
+    const typedArrayClass = this._componentTypedArray(accessor.componentType);
+    const typedArray = new typedArrayClass(arrayBufferBin, byteOffset, typedArrayComponentCount) as Uint16Array | Uint32Array;
+    return typedArray;
   }
 
   private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
