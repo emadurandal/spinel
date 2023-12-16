@@ -30,8 +30,8 @@ export class Primitive {
     this._material = material;
     this._vertexNumber = vertexData.position.length / Primitive._positionComponentNumber;
 
-    this._positionBuffer = this._setupVertexBuffer(vertexData.position, [0, 0, 0])!;
-    this._colorBuffer = this._setupVertexBuffer(vertexData.color, [1, 1, 1, 1]);
+    this._positionBuffer = this._setupVertexBuffer(vertexData.position)!;
+    this._colorBuffer = this._setupVertexBuffer(vertexData.color);
 
     if (vertexData.indices != null) {
       this._indexBuffer = this._setupIndexBuffer(vertexData.indices);
@@ -41,7 +41,7 @@ export class Primitive {
     this._mode = vertexData.mode;
   }
 
-  private _setupVertexBuffer(array: Float32Array | undefined, defaultArray: number[]) {
+  private _setupVertexBuffer(array: Float32Array | undefined) {
     if (array == null) {
       return undefined;
     }
