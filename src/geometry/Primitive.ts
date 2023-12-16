@@ -7,8 +7,8 @@ import { CameraType, PrimitiveMode } from "../definitions.js";
 export type VertexAttributeSet = {
   position: Float32Array,
   color?: Float32Array,
-  normal?: number[] | Float32Array,
-  texcoord?: number[] | Float32Array,
+  normal?: Float32Array,
+  texcoord?: Float32Array,
   indices?: Uint16Array | Uint32Array,
   mode: PrimitiveMode,
 }
