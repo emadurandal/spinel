@@ -21,6 +21,10 @@ export class Vector3 {
     return new Vector3(this.x - vec.x, this.y - vec.y, this.z - vec.z);
   }
 
+  multiply(val: number) {
+    return new Vector3(this.x * val, this.y * val, this.z * val);
+  }
+
   dot(vec: Vector3) {
     return this.x * vec.x + this.y * vec.y + this.z * vec.z;
   }
