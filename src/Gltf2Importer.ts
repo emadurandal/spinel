@@ -12,36 +12,10 @@ import { CameraType, PrimitiveMode } from './definitions.js';
 import { CameraComponent } from './ec/components/CameraComponent.js';
 
 export class Gltf2Importer {
-  private static readonly vertexShaderStr = `
-precision highp float;
-
-attribute vec3 a_position;
-attribute vec4 a_color;
-varying vec4 v_color;
-uniform mat4 u_worldMatrix;
-uniform mat4 u_viewMatrix;
-uniform mat4 u_projectionMatrix;
-
-void main(void) {
-  gl_Position = u_projectionMatrix * u_viewMatrix * u_worldMatrix * vec4(a_position, 1.0);
-  v_color = a_color;
-}
-`;
-
-private static readonly fragmentShaderStr = `
-precision highp float;
-
-varying vec4 v_color;
-uniform vec4 u_baseColor;
-
-void main(void) {
-  gl_FragColor = v_color * u_baseColor;
-}
-`;
 
   private constructor() {}
 
-  static async import(uri: string, context: Context): Promise<Entity[]> {
+  static async import(uri: string): Promise<Entity[]> {
     let response: Response;
     try {
       response = await fetch(uri);
@@ -54,7 +28,7 @@ void main(void) {
 
     const arrayBufferBin = await this._loadBin(json, uri);
 
-    const meshes = this._loadMesh(arrayBufferBin, json, context);
+    const meshes = this._loadMesh(arrayBufferBin, json);
     const entities = this._loadNode(json, meshes);
 
     return entities;
@@ -138,8 +112,8 @@ void main(void) {
     }
   }
 
-  private static _loadMaterial(json: Gltf2, materialIndex: number, context: Context) {
-    const material = new Material(context, Gltf2Importer.vertexShaderStr, Gltf2Importer.fragmentShaderStr);
+  private static _loadMaterial(json: Gltf2, materialIndex: number) {
+    const material = new Material();
 
     if (materialIndex >= 0) {
       const materialJson = json.materials[materialIndex];
@@ -158,7 +132,7 @@ void main(void) {
     return material;
   }
 
-  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, context: Context) {
+  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2) {
     const meshes: Mesh[] = []
     for (let meshJson of json.meshes) {
       const primitives: Primitive[] = [];
@@ -169,7 +143,7 @@ void main(void) {
         if (primitiveJson.material != null) {
           materialIndex = primitiveJson.material;
         }
-        const material = this._loadMaterial(json, materialIndex, context);
+        const material = this._loadMaterial(json, materialIndex);
 
         const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
         let colorTypedArray: Float32Array | undefined;
@@ -187,7 +161,7 @@ void main(void) {
           indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
         }
-        const primitive = new Primitive(material, context, vertexData);
+        const primitive = new Primitive(material, vertexData);
         primitives.push(primitive);
       }
       const mesh = new Mesh(primitives);
@@ -240,7 +214,7 @@ void main(void) {
         if (cameraJson.type === 'perspective') {
           const cameraComponent = entity.addCamera(CameraType.Perspective);
           cameraComponent.fovy = cameraJson.perspective!.yfov;
-          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? 1;
+          cameraComponent.aspect = cameraJson.perspective!.aspectRatio ?? -1;
           cameraComponent.near = cameraJson.perspective!.znear;
           cameraComponent.far = cameraJson.perspective!.zfar ?? Infinity;
           if (CameraComponent.activeCamera == null) {

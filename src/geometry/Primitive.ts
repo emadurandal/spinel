@@ -5,17 +5,17 @@ import { CameraComponent } from "../ec/components/CameraComponent.js";
 import { CameraType, PrimitiveMode } from "../definitions.js";
 
 export type VertexAttributeSet = {
-  position: number[] | Float32Array,
-  color?: number[] | Float32Array,
-  normal?: number[] | Float32Array,
-  texcoord?: number[] | Float32Array,
+  position: Float32Array,
+  color?: Float32Array,
+  normal?: Float32Array,
+  texcoord?: Float32Array,
   indices?: Uint16Array | Uint32Array,
   mode: PrimitiveMode,
 }
 
 export class Primitive {
   private _positionBuffer: WebGLBuffer;
-  private _colorBuffer: WebGLBuffer;
+  private _colorBuffer?: WebGLBuffer;
   private _indexBuffer?: WebGLBuffer;
   private _indexType: 5123 | 5125 = 5123; // gl.UNSIGNED_SHORT | gl.UNSIGNED_INT
   private _mode: PrimitiveMode = PrimitiveMode.Triangles;
@@ -23,17 +23,15 @@ export class Primitive {
   private _vertexNumber = 0;
   private _indexNumber = 0;
   private _material: Material;
-  private _context: Context;
   private static readonly _positionComponentNumber = 3;
   private static readonly _colorComponentNumber = 4;
 
-  constructor(material: Material, context: Context, vertexData: VertexAttributeSet) {
+  constructor(material: Material, vertexData: VertexAttributeSet) {
     this._material = material;
-    this._context = context;
     this._vertexNumber = vertexData.position.length / Primitive._positionComponentNumber;
 
-    this._positionBuffer = this._setupVertexBuffer(vertexData.position, [0, 0, 0]);
-    this._colorBuffer = this._setupVertexBuffer(vertexData.color!, [1, 1, 1, 1]);
+    this._positionBuffer = this._setupVertexBuffer(vertexData.position)!;
+    this._colorBuffer = this._setupVertexBuffer(vertexData.color);
 
     if (vertexData.indices != null) {
       this._indexBuffer = this._setupIndexBuffer(vertexData.indices);
@@ -43,26 +41,21 @@ export class Primitive {
     this._mode = vertexData.mode;
   }
 
-  private _setupVertexBuffer(_array: number[] | Float32Array, defaultArray: number[]) {
-    let array = _array;
+  private _setupVertexBuffer(array: Float32Array | undefined) {
     if (array == null) {
-      array = [];
-      for (let i=0; i<this._vertexNumber; i++) {
-        array = array.concat(defaultArray);
-      }
+      return undefined;
     }
 
-    const gl = this._context.gl;
+    const gl = Context.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    const typedArray = (array.constructor === Float32Array) ? array as Float32Array : new Float32Array(array);
-    gl.bufferData(gl.ARRAY_BUFFER, typedArray, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW);
 
     return buffer;
   }
 
   private _setupIndexBuffer(indicesArray: Uint16Array | Uint32Array) {
-    const gl = this._context.gl;
+    const gl = Context.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
@@ -70,21 +63,30 @@ export class Primitive {
     return buffer;
   }
 
-  private _setVertexAttribPointer(vertexBuffer: WebGLBuffer, attributeSlot: number, componentNumber: number) {
+  private _setVertexAttrib(vertexBuffer: WebGLBuffer | undefined, attributeSlot: number, componentNumber: number, defaultValue: number[]) {
     if (vertexBuffer != null) {
-      const gl = this._context.gl;
+      const gl = Context.gl;
       gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+      gl.enableVertexAttribArray(attributeSlot);
       gl.vertexAttribPointer(
         attributeSlot,
         componentNumber, gl.FLOAT, false, 0, 0);
+    } else {
+      const gl = Context.gl;
+      gl.disableVertexAttribArray(attributeSlot);
+      if (defaultValue.length === 3) {
+        gl.vertexAttrib3fv(attributeSlot, defaultValue);
+      } else if (defaultValue.length === 4) {
+        gl.vertexAttrib4fv(attributeSlot, defaultValue);
+      }
     }
   }
 
   draw(entity: Entity) {
-    const gl = this._context.gl;
+    const gl = Context.gl;
 
-    this._setVertexAttribPointer(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber);
-    this._setVertexAttribPointer(this._colorBuffer!, this.material.program!._attributeColor, Primitive._colorComponentNumber);
+    this._setVertexAttrib(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber, [0, 0, 0]);
+    this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 1, 1, 1]);
 
     this._material.useProgram(gl);
     this._material.setUniformValues(gl);

@@ -3,13 +3,40 @@ import { Context } from "./Context.js";
 import { Vector4 } from "./math/Vector4.js";
 
 export class Material {
+  private static readonly vertexShaderStr = `
+precision highp float;
+
+attribute vec3 a_position;
+attribute vec4 a_color;
+varying vec4 v_color;
+uniform mat4 u_worldMatrix;
+uniform mat4 u_viewMatrix;
+uniform mat4 u_projectionMatrix;
+
+void main(void) {
+  gl_Position = u_projectionMatrix * u_viewMatrix * u_worldMatrix * vec4(a_position, 1.0);
+  v_color = a_color;
+}
+`;
+
+private static readonly fragmentShaderStr = `
+precision highp float;
+
+varying vec4 v_color;
+uniform vec4 u_baseColor;
+
+void main(void) {
+  gl_FragColor = v_color * u_baseColor;
+}
+`;
+
   private _program: WebGLProgram;
   private _baseColor = new Vector4(1, 1, 1, 1);
 
-  constructor(context: Context, vertexShaderStr: string, fragmentShaderStr: string) {
-    const gl = context.gl;
-    var vertexShader = this.compileShader(gl, ShaderType.Vertex, vertexShaderStr) as WebGLShader;
-    var fragmentShader = this.compileShader(gl, ShaderType.Fragment, fragmentShaderStr) as WebGLShader;
+  constructor() {
+    const gl = Context.gl;
+    const vertexShader = this.compileShader(gl, ShaderType.Vertex, Material.vertexShaderStr) as WebGLShader;
+    const fragmentShader = this.compileShader(gl, ShaderType.Fragment, Material.fragmentShaderStr) as WebGLShader;
 
     const shaderProgram = gl.createProgram() as WebGLProgram;
 
@@ -28,9 +55,7 @@ export class Material {
     gl.useProgram(shaderProgram);
 
     shaderProgram._attributePosition = gl.getAttribLocation(shaderProgram, "a_position");
-    gl.enableVertexAttribArray(shaderProgram._attributePosition);
     shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
-    gl.enableVertexAttribArray(shaderProgram._attributeColor);
 
     shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
     shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
