@@ -163,6 +163,16 @@ export class Quaternion {
     return new Quaternion(x, y, z, w);
   }
 
+  transformVector(v: Vector3) {
+    const u = new Vector3(this.x, this.y, this.z);
+    const uv = u.cross(v);
+    const uuv = u.cross(uv);
+    const uvw = uv.multiply(this.w);
+    const uuv_uvw = uuv.add(uvw);
+    const uuv_uvw_2 = uuv_uvw.multiply(2);
+    return v.add(uuv_uvw_2);
+  }
+
   toEulerAngles() {
     const x = this.x, y = this.y, z = this.z, w = this.w;
 		const x2 = x + x,	y2 = y + y, z2 = z + z;
