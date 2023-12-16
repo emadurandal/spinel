@@ -18,6 +18,12 @@ export const CameraType = {
 } as const;
 export type CameraType= typeof CameraType[keyof typeof CameraType];
 
+export const CameraControllerType = {
+  Orbit: 0,
+  FirstPerson: 1
+} as const;
+export type CameraControllerType = typeof CameraControllerType[keyof typeof CameraControllerType];
+
 export const PrimitiveMode = {
   Points: 0,
   Lines: 1,
