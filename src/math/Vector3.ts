@@ -27,12 +27,24 @@ export class Vector3 {
     return new Vector3(this.x * val, this.y * val, this.z * val);
   }
 
+  divide(val: number) {
+    return new Vector3(this.x / val, this.y / val, this.z / val);
+  }
+
   dot(vec: Vector3) {
     return this.x * vec.x + this.y * vec.y + this.z * vec.z;
   }
 
   length() {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+  }
+
+  lengthTo(vec: Vector3) {
+    const deltaX = this.x - vec.x;
+    const deltaY = this.y - vec.y;
+    const deltaZ = this.z - vec.z;
+    
+    return Math.hypot(deltaX, deltaY, deltaZ);
   }
 
   cross(vec: Vector3) {
