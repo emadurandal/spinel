@@ -25,6 +25,10 @@ export class OrbitCameraController {
   private _rotY = 0; // rotation around x-axis in degrees
   public rotationRatio = 0.01;
 
+  // dolly
+  private _dollyVal = 1;
+  public dollyRatio = 0.01;
+
   private _pointerDownFn = this._pointerDown.bind(this);
   private _pointerMoveFn = this._pointerMove.bind(this);
   private _pointerUpFn = this._pointerUp.bind(this);
@@ -63,8 +67,9 @@ export class OrbitCameraController {
 
       if (e.shiftKey) {
         this._translate(pointerMoveX, pointerMoveY);
-      }
-        else {
+      } else if (e.altKey) {
+        this._dolly(pointerMoveX, pointerMoveY);
+      } else {
         this._rotate(pointerMoveX, pointerMoveY);
       }
         
@@ -79,18 +84,21 @@ export class OrbitCameraController {
   private _translate(pointerMoveX: number, pointerMoveY: number) {
     this._transX = -pointerMoveX * this.translationRatio;
     this._transY = -pointerMoveY * this.translationRatio;
-
-    // console.log(`transX: ${this._transX}, transY: ${this._transY}`);
   }
 
   private _rotate(pointerMoveX: number, pointerMoveY: number) {
     this._rotX -= pointerMoveX * this.rotationRatio;
     this._rotY += pointerMoveY * this.rotationRatio;
-
-    console.log(`rotX: ${this._rotX}, rotY: ${this._rotY}`); 
+  }
+  
+  private _dolly(pointerMoveX: number, pointerMoveY: number) {
+    this._dollyVal -= pointerMoveX * this.dollyRatio;
+    this._dollyVal = Math.min(Math.max(this._dollyVal, 0.01), 10);
   }
   
   private _calcTransform() {
+    this._targetEntity.getSceneGraph().setScale(new Vector3(this._dollyVal, this._dollyVal, this._dollyVal));
+
     // camera rotation
     const rotationMat = Matrix4.rotationY(this._rotX).multiply(Matrix4.rotationX(this._rotY));
     const rotation = rotationMat.getRotation();
