@@ -3,10 +3,11 @@ import { Quaternion } from "../../../math/Quaternion.js";
 import { Matrix4 } from "../../../math/Matrix4.js";
 import { Entity } from "../../Entity.js";
 import { CameraComponent } from "../Camera/CameraComponent.js";
+import { AABB } from "../../../math/AABB.js";
 
 export class OrbitCameraController {
   private _entity: Entity;
-  private _target?: Entity;
+  private _targets?: Entity[];
   private _targetEntity: Entity;
   private _isPointerDown = false;
   
@@ -19,7 +20,7 @@ export class OrbitCameraController {
   // translation
   private _transX = 0;
   private _transY = 0;
-  public translationRatio = 0.01;
+  public translationRatio = 0.001;
 
   // rotation angles
   private _rotX = 0; // rotation around y-axis in degrees
@@ -43,9 +44,18 @@ export class OrbitCameraController {
     this._registerEvents();
   }
 
-  setTarget(target: Entity) {
-    this._target = target;
-    this._targetEntity.getSceneGraph().setPosition(target.getSceneGraph().getPosition());
+  setTarget(targets: Entity[]) {
+    this._targets = targets;
+    const targetAABB = new AABB();
+    for (let target of targets) {
+      targetAABB.merge(target.getSceneGraph().getWorldMergedAABB());
+    }
+    this._targetEntity.getSceneGraph().setPosition(targetAABB.getCenterPoint());
+    const fovy = this._entity.getCamera()!.fovy;
+
+    // calculate the distance to the target so that the target fits in the viewport
+    const distanceToTarget = targetAABB.getLengthCornerToCorner() / Math.sin(fovy / 2);
+    this._entity.getTransform().setLocalPosition(new Vector3(0, 0, distanceToTarget));
   }
 
   private _registerEvents() {
@@ -96,8 +106,9 @@ export class OrbitCameraController {
   }
 
   private _translate(pointerMoveX: number, pointerMoveY: number) {
-    this._transX = -pointerMoveX * this.translationRatio;
-    this._transY = -pointerMoveY * this.translationRatio;
+    const distanceToTarget = this._entity.getSceneGraph().getPosition().length();
+    this._transX = -pointerMoveX * this.translationRatio * distanceToTarget;
+    this._transY = -pointerMoveY * this.translationRatio * distanceToTarget;
   }
 
   private _rotate(pointerMoveX: number, pointerMoveY: number) {
@@ -111,23 +122,23 @@ export class OrbitCameraController {
   }
   
   private _calcTransform() {
-    this._targetEntity.getSceneGraph().setScale(new Vector3(this._dollyVal, this._dollyVal, this._dollyVal));
+    this._targetEntity.getTransform().setLocalScale(new Vector3(this._dollyVal, this._dollyVal, this._dollyVal));
 
     // camera rotation
     const rotationMat = Matrix4.rotationY(this._rotX).multiply(Matrix4.rotationX(this._rotY));
     const rotation = rotationMat.getRotation();
-    this._targetEntity.getSceneGraph().setRotation(rotation);
+    this._targetEntity.getTransform().setLocalRotation(rotation);
     
     // camera translation
     const translationVec = new Vector3(this._transX, this._transY, 0);
     const translationVecRotated = rotation.transformVector(translationVec);
-    const currentCameraPos = this._targetEntity.getSceneGraph().getPosition();
-    this._targetEntity.getSceneGraph().setPosition(currentCameraPos.add(translationVecRotated));
+    const currentCameraPos = this._targetEntity.getTransform().getLocalPosition();
+    this._targetEntity.getTransform().setLocalPosition(currentCameraPos.add(translationVecRotated));
   }
 
   reset() {
-    this._targetEntity.getSceneGraph().setPosition(Vector3.zero());
-    this._targetEntity.getSceneGraph().setRotation(Quaternion.identity());
+    this._targetEntity.getTransform().setLocalPosition(Vector3.zero());
+    this._targetEntity.getTransform().setLocalRotation(Quaternion.identity());
     this._rotX = 0;
     this._rotY = 0;
   }

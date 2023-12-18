@@ -4,10 +4,10 @@ import { Entity } from "../../Entity.js";
 import { OrbitCameraController } from "./OrbitCameraController.js";
 
 export class CameraControllerComponent extends Component {
-  private _controller: OrbitCameraController;
+  private _orbitController: OrbitCameraController;
   private constructor(entity: Entity, controller: OrbitCameraController) {
     super(entity);
-    this._controller = controller;
+    this._orbitController = controller;
   }
 
   /**
@@ -21,5 +21,9 @@ export class CameraControllerComponent extends Component {
     } else {
       return new CameraControllerComponent(entity, new OrbitCameraController(entity));
     }
+  }
+
+  getOrbitController() {
+    return this._orbitController;
   }
 }

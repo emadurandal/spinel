@@ -70,6 +70,10 @@ export class Entity {
     return this._camera;
   }
 
+  getCameraController(): CameraControllerComponent | undefined {
+    return this._cameraController;
+  }
+
   static create(): Entity {
     const entity = new Entity(this._entities.length);
     this._entities.push(entity);
