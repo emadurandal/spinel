@@ -20,7 +20,7 @@ export class CameraComponent extends Component {
   private _top = 1;
 
   // perspective camera properties
-  private _fovy = 45;
+  private _fovy = 45 * Math.PI / 180;
   private _aspect = -1;
 
   static activeCamera?: CameraComponent;
