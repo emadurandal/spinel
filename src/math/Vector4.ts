@@ -28,6 +28,10 @@ export class Vector4 {
     return new Vector4(1, 1, 1, 1);
   }
 
+  add(vec: Vector4) {
+    return new Vector4(this.x + vec.x, this.y + vec.y, this.z + vec.z, 1);
+  }
+
   get x() {
     return this.v[0];
   }

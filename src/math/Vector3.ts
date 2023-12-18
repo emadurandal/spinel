@@ -1,3 +1,5 @@
+import { Vector4 } from "./Vector4.js";
+
 export class Vector3 {
   private v: Float32Array;
 
@@ -44,6 +46,10 @@ export class Vector3 {
   normalize() {
     const length = this.length();
     return new Vector3(this.x / length, this.y / length, this.z / length);
+  }
+
+  toVector4() {
+    return new Vector4(this.x, this.y, this.z, 1);
   }
 
   static zero() {
