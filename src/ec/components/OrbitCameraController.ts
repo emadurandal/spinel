@@ -59,7 +59,6 @@ export class OrbitCameraController {
     this._isPointerDown = true;
     this._pointerBgnX = e.clientX;
     this._pointerBgnY = e.clientY;
-    console.log("pointer down");
   }
 
   private _pointerMove(e: PointerEvent) {
@@ -139,8 +138,5 @@ export class OrbitCameraController {
     this._pointerBgnY = 0;
     this._transX = 0;
     this._transY = 0;
-    // this._rotX = 0;
-    // this._rotY = 0;
-    console.log("pointer up");
   }
 }
