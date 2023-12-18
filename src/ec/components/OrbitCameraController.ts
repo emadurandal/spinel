@@ -28,10 +28,12 @@ export class OrbitCameraController {
   // dolly
   private _dollyVal = 1;
   public dollyRatio = 0.01;
+  public wheelRatio = 0.001;
 
   private _pointerDownFn = this._pointerDown.bind(this);
   private _pointerMoveFn = this._pointerMove.bind(this);
   private _pointerUpFn = this._pointerUp.bind(this);
+  private _wheelFn = this._wheel.bind(this);
 
   constructor(entity: Entity) {
     this._entity = entity;
@@ -49,6 +51,7 @@ export class OrbitCameraController {
     window.addEventListener("pointerdown", this._pointerDownFn);
     window.addEventListener("pointermove", this._pointerMoveFn);
     window.addEventListener("pointerup", this._pointerUpFn);
+    window.addEventListener("wheel", this._wheelFn);
   }
 
   private _pointerDown(e: PointerEvent) {
@@ -68,7 +71,7 @@ export class OrbitCameraController {
       if (e.shiftKey) {
         this._translate(pointerMoveX, pointerMoveY);
       } else if (e.altKey) {
-        this._dolly(pointerMoveX, pointerMoveY);
+        this._dolly(pointerMoveX * this.dollyRatio, 0);
       } else {
         this._rotate(pointerMoveX, pointerMoveY);
       }
@@ -80,6 +83,10 @@ export class OrbitCameraController {
     }
   }
 
+  private _wheel(e: WheelEvent) {
+    this._dolly(e.deltaY * this.wheelRatio, 0);
+    this._calcTransform();
+  }
 
   private _translate(pointerMoveX: number, pointerMoveY: number) {
     this._transX = -pointerMoveX * this.translationRatio;
@@ -92,7 +99,7 @@ export class OrbitCameraController {
   }
   
   private _dolly(pointerMoveX: number, pointerMoveY: number) {
-    this._dollyVal -= pointerMoveX * this.dollyRatio;
+    this._dollyVal -= pointerMoveX;
     this._dollyVal = Math.min(Math.max(this._dollyVal, 0.01), 10);
   }
   
