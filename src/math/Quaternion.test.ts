@@ -48,3 +48,15 @@ test("Quaternion.fromEuler", () => {
 
   expect(v.isEqual(v2, 0.001)).toBe(true);
 });
+
+test("Quaternion.transformVector", () => {
+  const euler = new Vector3(Math.PI / 2, 0, Math.PI / 2);
+  const q = Quaternion.fromEulerAngles(euler);
+  const testVec = new Vector3(1, 0, 0);
+  const v = q.transformVector(testVec);
+
+  const m = Matrix4.fromQuaternion(q);
+  const v2 = m.multiplyVector(new Vector4(testVec.x, testVec.y, testVec.z, 1)).toVector3();
+
+  expect(v.isEqual(v2, 0.001)).toBe(true);
+});

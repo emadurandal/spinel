@@ -3,7 +3,9 @@ import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
 import { TransformComponent } from "./components/TransformComponent.js";
 import { CameraComponent } from "./components/CameraComponent.js";
 import type { Mesh } from "../geometry/Mesh.js";
-import { CameraType } from "../definitions.js";
+import { CameraControllerType, CameraType } from "../definitions.js";
+import { CameraControllerComponent } from "./components/CameraControllerComponent.js";
+import { OrbitCameraController } from "./components/OrbitCameraController.js";
 
 export class Entity {
   private _name: string;
@@ -15,6 +17,7 @@ export class Entity {
   private _sceneGraph: SceneGraphComponent;
   private _mesh?: MeshComponent;
   private _camera?: CameraComponent;
+  private _cameraController?: CameraControllerComponent;
 
   private constructor(id: number) {
     this._id = id;
@@ -44,6 +47,11 @@ export class Entity {
   addCamera(type: CameraType): CameraComponent {
     this._camera = CameraComponent._create(this, type);
     return this._camera;
+  }
+
+  addCameraController(controllerType: CameraControllerType): CameraControllerComponent {
+    this._cameraController = CameraControllerComponent._create(this, controllerType);
+    return this._cameraController;
   }
 
   getTransform(): TransformComponent {

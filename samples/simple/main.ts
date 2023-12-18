@@ -34,6 +34,7 @@ async function main() {
   const cameraEntity = Spinel.Entity.create();
   cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 4));
   cameraEntity.addCamera(Spinel.CameraType.Perspective);
+  cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
 
   const meshEntities = Spinel.Entity.getAllMeshEntities();
 

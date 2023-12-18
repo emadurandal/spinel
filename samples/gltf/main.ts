@@ -4,15 +4,18 @@ async function main() {
 
   const canvas = document.getElementById('world') as HTMLCanvasElement;
   Spinel.Context.setup(canvas);
-  const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf');
+  const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/BrainStem/glTF/BrainStem.gltf');
 
   const gl = Spinel.Context.gl;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
-  // const cameraEntity = Spinel.Entity.create();
-  // cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 4));
-  // cameraEntity.addCamera(Spinel.CameraType.Perspective);
+  const cameraEntity = Spinel.Entity.create();
+  cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 4));
+  cameraEntity.addCamera(Spinel.CameraType.Perspective);
+  Spinel.CameraComponent.activeCamera = cameraEntity.getCamera()!;
+  cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
+
   const meshEntities = Spinel.Entity.getAllMeshEntities();
 
   const draw = () => {

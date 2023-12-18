@@ -29,6 +29,7 @@ async function main() {
     const cameraEntity = Spinel.Entity.create();
     cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 4));
     cameraEntity.addCamera(Spinel.CameraType.Perspective);
+    cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
     const meshEntities = Spinel.Entity.getAllMeshEntities();
     const draw = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
