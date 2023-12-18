@@ -4,6 +4,7 @@ import { Quaternion } from "../../../math/Quaternion.js";
 import { Component } from "../../Component.js";
 import { Entity } from "../../Entity.js";
 import { Transform } from "../../../math/Transform.js";
+import { AABB } from "../../../math/AABB.js";
 
 export class SceneGraphComponent extends Component {
   private _children: SceneGraphComponent[];
@@ -130,6 +131,23 @@ export class SceneGraphComponent extends Component {
       const invMat = mat.invert();
       this.entity.getTransform().setLocalScale(invMat.multiplyVector(vec).toVector3());
     }
+  }
+
+  getWorldAABB() {
+    const localAABB = (this.entity.getMesh() != null) ? this.entity.getMesh()!.getLocalAABB() : new AABB();
+    const worldAABB = localAABB.transformByMatrix(this.getMatrix());
+    
+    return worldAABB;
+  }
+
+  getWorldMergedAABB() {
+    const aabb = this.getWorldAABB();
+    for (const child of this.children) {
+      const childAABB = child.getWorldMergedAABB();
+      aabb.merge(childAABB);
+    }
+
+    return aabb;
   }
 
   /**

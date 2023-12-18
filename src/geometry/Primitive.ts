@@ -142,4 +142,8 @@ export class Primitive {
   get material() {
     return this._material;
   }
+
+  getLocalAABB() {
+    return this._localAabb.clone();
+  }
 }

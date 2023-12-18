@@ -14,6 +14,10 @@ export class MeshComponent extends Component {
     this._mesh.draw(this.entity);
   }
 
+  getLocalAABB() {
+    return this._mesh.getLocalAABB();
+  }
+
   /**
    * @private
    * @param mesh 
