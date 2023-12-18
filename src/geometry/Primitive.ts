@@ -3,6 +3,8 @@ import { Context } from "../Context.js";
 import { Entity } from "../ec/Entity.js";
 import { CameraComponent } from "../ec/components/Camera/CameraComponent.js";
 import { CameraType, PrimitiveMode } from "../definitions.js";
+import { AABB } from "../math/AABB.js";
+import { Vector3 } from "../math/Vector3.js";
 
 export type VertexAttributeSet = {
   position: Float32Array,
@@ -11,6 +13,7 @@ export type VertexAttributeSet = {
   texcoord?: Float32Array,
   indices?: Uint16Array | Uint32Array,
   mode: PrimitiveMode,
+  aabb?: AABB
 }
 
 export class Primitive {
@@ -25,6 +28,7 @@ export class Primitive {
   private _material: Material;
   private static readonly _positionComponentNumber = 3;
   private static readonly _colorComponentNumber = 4;
+  private _localAabb = new AABB();
 
   constructor(material: Material, vertexData: VertexAttributeSet) {
     this._material = material;
@@ -38,7 +42,19 @@ export class Primitive {
       this._indexNumber = vertexData.indices.length;
     }
 
+    this.setupAABB(vertexData);
+  }
+
+  private setupAABB(vertexData: VertexAttributeSet) {
     this._mode = vertexData.mode;
+    if (vertexData.aabb != null) {
+      this._localAabb = vertexData.aabb.clone();
+    } else {
+      for (let i = 0; i < this._vertexNumber; i++) {
+        const point = new Vector3(vertexData.position[i * 3], vertexData.position[i * 3 + 1], vertexData.position[i * 3 + 2]);
+        this._localAabb.addPoint(point);
+      }
+    }
   }
 
   private _setupVertexBuffer(array: Float32Array | undefined) {

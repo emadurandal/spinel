@@ -19,6 +19,17 @@ export class AABB {
     );
   }
 
+  setMinAndMax(min: Vector3, max: Vector3) {
+    this._min = min.clone();
+    this._max = max.clone();
+  }
+
+  clone() {
+    const aabb = new AABB();
+    aabb.setMinAndMax(this._min, this._max);
+    return aabb;
+  }
+
   merge(aabb: AABB) {
     if (aabb.isVanilla()) {
       return;
