@@ -10,6 +10,7 @@ import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { CameraType, PrimitiveMode } from './definitions.js';
 import { CameraComponent } from './ec/components/Camera/CameraComponent.js';
+import { AABB } from './math/AABB.js';
 
 export class Gltf2Importer {
 
@@ -155,11 +156,19 @@ export class Gltf2Importer {
         if (primitiveJson.indices != null) {
           indicesTypedArray = this.getIndices(json, primitiveJson.indices, arrayBufferBin);
         }
+
+        const accessor = json.accessors[attributes.POSITION];
+        const aabb = new AABB();
+        if (accessor.max != null && accessor.min != null) {
+          aabb.setMinAndMax(new Vector3(accessor.min[0], accessor.min[1], accessor.min[2]), new Vector3(accessor.max[0], accessor.max[1], accessor.max[2]));
+        }
+
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
           color: colorTypedArray,
           indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
+          aabb: aabb,
         }
         const primitive = new Primitive(material, vertexData);
         primitives.push(primitive);
