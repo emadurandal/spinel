@@ -1,3 +1,4 @@
+import { Matrix4 } from "./Matrix4.js";
 import { Vector3 } from "./Vector3.js";
 
 export class AABB {
@@ -16,6 +17,27 @@ export class AABB {
       Math.max(this._max.y, point.y),
       Math.max(this._max.z, point.z)
     );
+  }
+
+  merge(aabb: AABB) {
+    if (aabb.isVanilla()) {
+      return;
+    }
+
+    this.addPoint(aabb.getMin());
+    this.addPoint(aabb.getMax());
+  }
+
+  transformByMatrix(matrix: Matrix4) {
+    if (this.isVanilla()) {
+      return this;
+    }
+
+    const newAABB = new AABB();
+    newAABB.addPoint(matrix.multiplyVector(this._min).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(this._max).toVector3());
+
+    return newAABB;
   }
 
   isVanilla() {
