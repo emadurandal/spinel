@@ -11,7 +11,7 @@ export class CameraComponent extends Component {
 
   // common camera properties
   private _near = 0.1;
-  private _far = 1000;
+  private _far = Infinity;
   
   // orthographic camera properties
   private _left = -1;
