@@ -1,7 +1,8 @@
 import { Vector3 } from "../../math/Vector3.js";
-import { Transform } from "../../math/Transform.js";
+import { Quaternion } from "../../math/Quaternion.js";
+import { Matrix4 } from "../../math/Matrix4.js";
 import { Entity } from "../Entity.js";
-import { Matrix4, Quaternion } from "../../index2.js";
+import { CameraComponent } from "../../ec/components/CameraComponent.js";
 
 export class OrbitCameraController {
   private _entity: Entity;
@@ -62,6 +63,10 @@ export class OrbitCameraController {
   }
 
   private _pointerMove(e: PointerEvent) {
+    if (this._entity.getCamera() !== CameraComponent.activeCamera) {
+      return;
+    }
+
     if (this._isPointerDown) {
       this._pointerX = e.clientX;
       this._pointerY = e.clientY;
@@ -84,6 +89,9 @@ export class OrbitCameraController {
   }
 
   private _wheel(e: WheelEvent) {
+    if (this._entity.getCamera() !== CameraComponent.activeCamera) {
+      return;
+    }
     this._dolly(e.deltaY * this.wheelRatio, 0);
     this._calcTransform();
   }
