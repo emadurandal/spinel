@@ -9,7 +9,7 @@ import { Vector3 } from './math/Vector3.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { CameraType, PrimitiveMode } from './definitions.js';
-import { CameraComponent } from './ec/components/CameraComponent.js';
+import { CameraComponent } from './ec/components/Camera/CameraComponent.js';
 
 export class Gltf2Importer {
 

@@ -1,9 +1,9 @@
-import { Context } from "../../Context.js";
-import { CameraType } from "../../definitions.js";
-import { Matrix4 } from "../../math/Matrix4.js";
-import { Vector3 } from "../../math/Vector3.js";
-import { Component } from "../Component.js";
-import { Entity } from "../Entity.js";
+import { Context } from "../../../Context.js";
+import { CameraType } from "../../../definitions.js";
+import { Matrix4 } from "../../../math/Matrix4.js";
+import { Vector3 } from "../../../math/Vector3.js";
+import { Component } from "../../Component.js";
+import { Entity } from "../../Entity.js";
 
 export class CameraComponent extends Component {
   private _projectionMatrix: Matrix4;

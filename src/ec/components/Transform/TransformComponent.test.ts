@@ -1,7 +1,7 @@
-import { Quaternion } from "../../math/Quaternion.js";
-import { Transform } from "../../math/Transform.js";
-import { Vector3 } from "../../math/Vector3.js";
-import { Entity } from "../Entity.js";
+import { Quaternion } from "../../../math/Quaternion.js";
+import { Transform } from "../../../math/Transform.js";
+import { Vector3 } from "../../../math/Vector3.js";
+import { Entity } from "../../Entity.js";
 
 test("TransformComponent", () => {
   const entity = Entity.create();

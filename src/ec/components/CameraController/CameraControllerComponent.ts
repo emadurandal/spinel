@@ -1,6 +1,6 @@
-import { CameraControllerType } from "../../definitions.js";
-import { Component } from "../Component.js";
-import { Entity } from "../Entity.js";
+import { CameraControllerType } from "../../../definitions.js";
+import { Component } from "../../Component.js";
+import { Entity } from "../../Entity.js";
 import { OrbitCameraController } from "./OrbitCameraController.js";
 
 export class CameraControllerComponent extends Component {

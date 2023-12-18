@@ -1,7 +1,7 @@
 import { Material } from "../Material.js";
 import { Context } from "../Context.js";
 import { Entity } from "../ec/Entity.js";
-import { CameraComponent } from "../ec/components/CameraComponent.js";
+import { CameraComponent } from "../ec/components/Camera/CameraComponent.js";
 import { CameraType, PrimitiveMode } from "../definitions.js";
 
 export type VertexAttributeSet = {

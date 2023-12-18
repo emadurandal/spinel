@@ -1,9 +1,9 @@
-import { Vector3 } from "../../math/Vector3.js";
-import { Matrix4 } from "../../math/Matrix4.js";
-import { Quaternion } from "../../math/Quaternion.js";
-import { Component } from "../Component.js";
-import { Entity } from "../Entity.js";
-import { Transform } from "../../math/Transform.js";
+import { Vector3 } from "../../../math/Vector3.js";
+import { Matrix4 } from "../../../math/Matrix4.js";
+import { Quaternion } from "../../../math/Quaternion.js";
+import { Component } from "../../Component.js";
+import { Entity } from "../../Entity.js";
+import { Transform } from "../../../math/Transform.js";
 
 export class SceneGraphComponent extends Component {
   private _children: SceneGraphComponent[];
