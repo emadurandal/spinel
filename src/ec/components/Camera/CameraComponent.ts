@@ -1,4 +1,4 @@
-import { Context } from "../../../Context.js";
+import { System } from "../../../System.js";
 import { CameraType } from "../../../definitions.js";
 import { Matrix4 } from "../../../math/Matrix4.js";
 import { Vector3 } from "../../../math/Vector3.js";
@@ -49,7 +49,7 @@ export class CameraComponent extends Component {
     if (this._type === CameraType.Perspective) {
       let aspect = this._aspect;
       if (aspect < 0) {
-        aspect = Context.canvasAspectRatio;
+        aspect = System.canvasAspectRatio;
       }
       this._projectionMatrix = Matrix4.perspective(this._fovy, aspect, this._near, this._far);
     } else if (this._type === CameraType.Orthographic) {

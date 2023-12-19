@@ -1,7 +1,7 @@
 import { Primitive, VertexAttributeSet } from './geometry/Primitive.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import { Material } from './Material.js';
-import { Context } from './Context.js';
+import { System } from './System.js';
 import { Vector4 } from './math/Vector4.js';
 import { Mesh } from './geometry/Mesh.js';
 import { Entity } from './ec/Entity.js';

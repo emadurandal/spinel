@@ -1,26 +1,20 @@
 import Spinel from '../../dist/index.js';
 async function main() {
     const canvas = document.getElementById('world');
-    Spinel.Context.setup(canvas);
+    Spinel.System.setup(canvas);
     // const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf');
     const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Buggy/glTF/Buggy.gltf');
     // const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/GearboxAssy/glTF/GearboxAssy.gltf');
-    const gl = Spinel.Context.gl;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
     const cameraEntity = Spinel.Entity.create();
     cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 0));
     cameraEntity.addCamera(Spinel.CameraType.Perspective);
     Spinel.CameraComponent.activeCamera = cameraEntity.getCamera();
-    cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
+    // cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
+    cameraEntity.addCameraController(Spinel.CameraControllerType.Walk);
     const cameraController = cameraEntity.getCameraController();
-    cameraController.getOrbitController().setTarget(entities);
-    const meshEntities = Spinel.Entity.getAllMeshEntities();
+    // cameraController.getOrbitController()!.setTarget(entities);
     const draw = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        for (const meshEntity of meshEntities) {
-            meshEntity.getMesh().draw();
-        }
+        Spinel.System.processAuto();
         requestAnimationFrame(draw);
     };
     draw();

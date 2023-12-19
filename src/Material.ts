@@ -1,5 +1,5 @@
 import { ShaderType, WebGLProgram } from "./definitions.js";
-import { Context } from "./Context.js";
+import { System } from "./System.js";
 import { Vector4 } from "./math/Vector4.js";
 
 export class Material {
@@ -34,7 +34,7 @@ void main(void) {
   private _baseColor = new Vector4(1, 1, 1, 1);
 
   constructor() {
-    const gl = Context.gl;
+    const gl = System.gl;
     const vertexShader = this.compileShader(gl, ShaderType.Vertex, Material.vertexShaderStr) as WebGLShader;
     const fragmentShader = this.compileShader(gl, ShaderType.Fragment, Material.fragmentShaderStr) as WebGLShader;
 

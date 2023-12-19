@@ -1,10 +1,7 @@
 import Spinel from '../../dist/index.js';
 async function main() {
     const canvas = document.getElementById('world');
-    Spinel.Context.setup(canvas);
-    const gl = Spinel.Context.gl;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
+    Spinel.System.setup(canvas);
     const meshEntity = Spinel.Entity.create();
     const material = new Spinel.Material();
     const vertexData = {
@@ -30,12 +27,8 @@ async function main() {
     cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 4));
     cameraEntity.addCamera(Spinel.CameraType.Perspective);
     cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
-    const meshEntities = Spinel.Entity.getAllMeshEntities();
     const draw = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        for (const meshEntity of meshEntities) {
-            meshEntity.getMesh().draw();
-        }
+        Spinel.System.processAuto();
         requestAnimationFrame(draw);
     };
     draw();
