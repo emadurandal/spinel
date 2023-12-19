@@ -1,11 +1,11 @@
-import { MeshComponent } from "./components/MeshComponent.js";
-import { SceneGraphComponent } from "./components/SceneGraphComponent.js";
-import { TransformComponent } from "./components/TransformComponent.js";
-import { CameraComponent } from "./components/CameraComponent.js";
+import { MeshComponent } from "./components/Mesh/MeshComponent.js";
+import { SceneGraphComponent } from "./components/SceneGraph/SceneGraphComponent.js";
+import { TransformComponent } from "./components/Transform/TransformComponent.js";
+import { CameraComponent } from "./components/Camera/CameraComponent.js";
 import type { Mesh } from "../geometry/Mesh.js";
 import { CameraControllerType, CameraType } from "../definitions.js";
-import { CameraControllerComponent } from "./components/CameraControllerComponent.js";
-import { OrbitCameraController } from "./components/OrbitCameraController.js";
+import { CameraControllerComponent } from "./components/CameraController/CameraControllerComponent.js";
+import { OrbitCameraController } from "./components/CameraController/OrbitCameraController.js";
 
 export class Entity {
   private _name: string;
@@ -68,6 +68,10 @@ export class Entity {
 
   getCamera(): CameraComponent | undefined {
     return this._camera;
+  }
+
+  getCameraController(): CameraControllerComponent | undefined {
+    return this._cameraController;
   }
 
   static create(): Entity {

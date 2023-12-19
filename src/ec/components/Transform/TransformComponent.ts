@@ -1,9 +1,9 @@
-import { Matrix4 } from "../../math/Matrix4.js";
-import { Quaternion } from "../../math/Quaternion.js";
-import { Transform } from "../../math/Transform.js";
-import { Vector3 } from "../../math/Vector3.js";
-import { Component } from "../Component.js";
-import type { Entity } from "../Entity.js";
+import { Matrix4 } from "../../../math/Matrix4.js";
+import { Quaternion } from "../../../math/Quaternion.js";
+import { Transform } from "../../../math/Transform.js";
+import { Vector3 } from "../../../math/Vector3.js";
+import { Component } from "../../Component.js";
+import type { Entity } from "../../Entity.js";
 
 export class TransformComponent extends Component {
   private _transform: Transform;

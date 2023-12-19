@@ -1,9 +1,9 @@
-import { Context } from "../../Context.js";
-import { CameraType } from "../../definitions.js";
-import { Matrix4 } from "../../math/Matrix4.js";
-import { Vector3 } from "../../math/Vector3.js";
-import { Component } from "../Component.js";
-import { Entity } from "../Entity.js";
+import { Context } from "../../../Context.js";
+import { CameraType } from "../../../definitions.js";
+import { Matrix4 } from "../../../math/Matrix4.js";
+import { Vector3 } from "../../../math/Vector3.js";
+import { Component } from "../../Component.js";
+import { Entity } from "../../Entity.js";
 
 export class CameraComponent extends Component {
   private _projectionMatrix: Matrix4;
@@ -11,7 +11,7 @@ export class CameraComponent extends Component {
 
   // common camera properties
   private _near = 0.1;
-  private _far = 1000;
+  private _far = Infinity;
   
   // orthographic camera properties
   private _left = -1;
@@ -20,7 +20,7 @@ export class CameraComponent extends Component {
   private _top = 1;
 
   // perspective camera properties
-  private _fovy = 45;
+  private _fovy = 45 * Math.PI / 180;
   private _aspect = -1;
 
   static activeCamera?: CameraComponent;

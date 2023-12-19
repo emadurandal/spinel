@@ -1,6 +1,6 @@
-import { Mesh } from "../../geometry/Mesh.js";
-import { Component } from "../Component.js";
-import { Entity } from "../Entity.js";
+import { Mesh } from "../../../geometry/Mesh.js";
+import { Component } from "../../Component.js";
+import { Entity } from "../../Entity.js";
 
 export class MeshComponent extends Component {
   private _mesh: Mesh;
@@ -12,6 +12,10 @@ export class MeshComponent extends Component {
 
   draw() {
     this._mesh.draw(this.entity);
+  }
+
+  getLocalAABB() {
+    return this._mesh.getLocalAABB();
   }
 
   /**
