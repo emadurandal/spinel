@@ -23,8 +23,8 @@ export class OrbitCameraController {
   public translationRatio = 0.001;
 
   // rotation angles
-  private _rotX = 0; // rotation around y-axis in degrees
-  private _rotY = 0; // rotation around x-axis in degrees
+  private _rotX = 0; // rotation around y-axis
+  private _rotY = 0; // rotation around x-axis
   public rotationRatio = 0.01;
 
   // dolly
