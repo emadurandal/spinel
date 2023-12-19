@@ -19,6 +19,12 @@ Then, build the library:
 $ npm run build
 ```
 
+## Build the examples
+
+```bash
+$ npm run build-sample
+```
+
 ## Run the examples
 
 ```bash
