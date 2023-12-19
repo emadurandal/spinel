@@ -12,15 +12,17 @@ async function main() {
     cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 0));
     cameraEntity.addCamera(Spinel.CameraType.Perspective);
     Spinel.CameraComponent.activeCamera = cameraEntity.getCamera();
-    cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
+    // cameraEntity.addCameraController(Spinel.CameraControllerType.Orbit);
+    cameraEntity.addCameraController(Spinel.CameraControllerType.Walk);
     const cameraController = cameraEntity.getCameraController();
-    cameraController.getOrbitController().setTarget(entities);
+    // cameraController.getOrbitController()!.setTarget(entities);
     const meshEntities = Spinel.Entity.getAllMeshEntities();
     const draw = () => {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         for (const meshEntity of meshEntities) {
             meshEntity.getMesh().draw();
         }
+        cameraController.getWalkController()?.process();
         requestAnimationFrame(draw);
     };
     draw();
