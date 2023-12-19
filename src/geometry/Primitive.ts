@@ -1,5 +1,5 @@
 import { Material } from "../Material.js";
-import { Context } from "../Context.js";
+import { System } from "../System.js";
 import { Entity } from "../ec/Entity.js";
 import { CameraComponent } from "../ec/components/Camera/CameraComponent.js";
 import { CameraType, PrimitiveMode } from "../definitions.js";
@@ -62,7 +62,7 @@ export class Primitive {
       return undefined;
     }
 
-    const gl = Context.gl;
+    const gl = System.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, array, gl.STATIC_DRAW);
@@ -71,7 +71,7 @@ export class Primitive {
   }
 
   private _setupIndexBuffer(indicesArray: Uint16Array | Uint32Array) {
-    const gl = Context.gl;
+    const gl = System.gl;
     const buffer = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesArray, gl.STATIC_DRAW);
@@ -81,14 +81,14 @@ export class Primitive {
 
   private _setVertexAttrib(vertexBuffer: WebGLBuffer | undefined, attributeSlot: number, componentNumber: number, defaultValue: number[]) {
     if (vertexBuffer != null) {
-      const gl = Context.gl;
+      const gl = System.gl;
       gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
       gl.enableVertexAttribArray(attributeSlot);
       gl.vertexAttribPointer(
         attributeSlot,
         componentNumber, gl.FLOAT, false, 0, 0);
     } else {
-      const gl = Context.gl;
+      const gl = System.gl;
       gl.disableVertexAttribArray(attributeSlot);
       if (defaultValue.length === 3) {
         gl.vertexAttrib3fv(attributeSlot, defaultValue);
@@ -99,7 +99,7 @@ export class Primitive {
   }
 
   draw(entity: Entity) {
-    const gl = Context.gl;
+    const gl = System.gl;
 
     this._setVertexAttrib(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber, [0, 0, 0]);
     this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 1, 1, 1]);
