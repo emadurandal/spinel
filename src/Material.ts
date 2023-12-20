@@ -1,7 +1,7 @@
 import { SamplerMagFilter, SamplerMinFilter, SamplerWrapMode, ShaderType, WebGLProgram } from "./definitions.js";
 import { System } from "./System.js";
 import { Vector4 } from "./math/Vector4.js";
-import { Texture2D } from "./Texture.js";
+import { Texture2D } from "./Texture2D.js";
 
 export class Material {
   private static readonly vertexShaderStr = `#version 300 es

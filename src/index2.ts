@@ -6,4 +6,4 @@ export * from "./glTF2.js";
 export * from "./Gltf2Importer.js";
 export * from "./Material.js";
 export * from "./System.js";
-export * from "./Texture.js";
+export * from "./Texture2D.js";
