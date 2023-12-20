@@ -17,21 +17,61 @@ export class Gltf2Importer {
   private constructor() {}
 
   static async import(uri: string): Promise<Entity[]> {
-    let response: Response;
     const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
-    try {
-      response = await fetch(uri);
-    } catch (err) {
-      console.log('glTF2 load error.', err);
-    };
+    const response = await fetch(uri);
+    if (!response.ok) {
+      throw new Error('Failed to load glTF file. Status: ' + response.status + ' ' + response.statusText);
+    }
     const arrayBuffer = await response!.arrayBuffer();
+    
+    const dataView = new DataView(arrayBuffer, 0, 20);
+    // Magic field
+    const magic = dataView.getUint32(0, true);
+    // 0x46546C67 is 'glTF' in ASCII codes.
+    if (magic === 0x46546c67) {
+      return this.loadGlb(arrayBuffer, basePath);
+    } else {
+      return this.loadGltf(arrayBuffer, basePath);
+    }
+
+  }
+
+  private static async loadGlb(arrayBuffer: ArrayBuffer, basePath: string): Promise<Entity[]> {
+    const dataView = new DataView(arrayBuffer, 0, 20);
+    const gltfVer = dataView.getUint32(4, true);
+    if (gltfVer !== 2) {
+      throw new Error('invalid version field in this binary glTF file.');
+    }
+    const lengthOfJSonChunkData = dataView.getUint32(12, true);
+    const chunkType = dataView.getUint32(16, true);
+    // 0x4E4F534A means JSON format (0x4E4F534A is 'JSON' in ASCII codes)
+    if (chunkType !== 0x4e4f534a) {
+      throw new Error('invalid chunkType of chunk0 in this binary glTF file.');
+    }
+    const uint8ArrayJSonContent = new Uint8Array(arrayBuffer, 20, lengthOfJSonChunkData);
+    const textDecoder = new TextDecoder();
+    const gotText = textDecoder.decode(uint8ArrayJSonContent);
+    const gltfJson = JSON.parse(gotText);
+    const arrayBufferBin = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
+
+    const entities = this._loadInner(gltfJson, basePath, arrayBufferBin);
+
+    return entities;
+  }
+
+  private static async loadGltf(arrayBuffer: ArrayBuffer, basePath: string) {
     const gotText = this._arrayBufferToString(arrayBuffer);
     const json = JSON.parse(gotText) as Gltf2
+    const arrayBufferBin = await this._loadBin(json, basePath);
+    
+    const entities = this._loadInner(json, basePath, arrayBufferBin);
 
-    const arrayBufferBin = await this._loadBin(json, uri);
+    return entities;
+  }
 
-    const textures = this._loadTexture(json, basePath);
-    const meshes = this._loadMesh(arrayBufferBin, json, textures);
+  private static _loadInner(json: Gltf2, basePath: string, arrayBuffer: ArrayBuffer) {
+    const textures = this._loadTexture(json, basePath, arrayBuffer);
+    const meshes = this._loadMesh(arrayBuffer, json, textures);
     const entities = this._loadNode(json, meshes);
 
     return entities;
@@ -52,11 +92,7 @@ export class Gltf2Importer {
     }
   }
 
-  private static async _loadBin(json: Gltf2, uri: string) {
-
-    //Set the location of gltf file as basePath
-    const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
-
+  private static async _loadBin(json: Gltf2, basePath: string) {
     const bufferInfo = json.buffers[0];
     const splitted = bufferInfo.uri!.split('/');
     const filename = splitted[splitted.length - 1];
@@ -115,7 +151,7 @@ export class Gltf2Importer {
     }
   }
 
-  private static _loadTexture(json: Gltf2, basePath: string) {
+  private static _loadTexture(json: Gltf2, basePath: string, arrayBuffer: ArrayBuffer) {
     const textures: Texture2D[] = [];
     for (let textureJson of json.textures) {
       const imageJson = json.images[textureJson.source!];
@@ -137,6 +173,15 @@ export class Gltf2Importer {
       const tex = new Texture2D();
       if (imageJson.uri != null) {
         tex.loadByUrl(basePath + imageJson.uri, textureParameters);
+      } else if (imageJson.bufferView != null) {
+        const bufferView = json.bufferViews[imageJson.bufferView];
+        const byteOffsetInBuffer = bufferView.byteOffset ?? 0;
+        const buffer = new Uint8Array(arrayBuffer, byteOffsetInBuffer, bufferView.byteLength);
+        const blob = new Blob([buffer], {type: imageJson.mimeType});
+        const url = URL.createObjectURL(blob);
+        tex.loadByUrl(url, textureParameters, ()=>{
+          URL.revokeObjectURL(url);
+        });
       }
       textures.push(tex);
     }
