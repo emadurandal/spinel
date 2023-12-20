@@ -86,16 +86,13 @@ test('AABB transformByMatrix', () => {
 test('AABB transformByMatrix 2', () => {
   const aabb = new AABB();
   aabb.addPoint(new Vector3(1, 0, 0));
+  aabb.addPoint(new Vector3(0, 1, 0));
 
-  const aabb2 = aabb.transformByMatrix(Matrix4.rotationY(Math.PI / 2));
+  const aabb2 = aabb.transformByMatrix(Matrix4.rotationZ(Math.PI / 4));
 
-  expect(aabb2.getMin().isEqual(new Vector3(0, 0, -1))).toBe(true);
-  expect(aabb2.getMax().isEqual(new Vector3(0, 0, -1))).toBe(true);
-  expect(aabb2.getCenterPoint().isEqual(new Vector3(0, 0, -1))).toBe(true);
-  expect(aabb2.getSizeX()).toBe(0);
-  expect(aabb2.getSizeY()).toBe(0);
-  expect(aabb2.getSizeZ()).toBe(0);
-  expect(aabb2.getLengthCornerToCorner()).toBe(0);
+  expect(aabb2.getMin().isEqual(new Vector3(-0.7071067690849304, 0, 0), 0.001)).toBe(true);
+  expect(aabb2.getMax().isEqual(new Vector3(0.7071067690849304, 1.4142135381698608, 0), 0.001)).toBe(true);
+  expect(aabb2.getCenterPoint().isEqual(new Vector3(0, 0.7071067690849304, 0), 0.001)).toBe(true);
 });
 
 test('AABB transformByMatrix with vanilla AABB', () => {
