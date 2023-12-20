@@ -104,8 +104,9 @@ export class Primitive {
     this._setVertexAttrib(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber, [0, 0, 0]);
     this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 1, 1, 1]);
 
-    this._material.useProgram(gl);
-    this._material.setUniformValues(gl);
+    this._material.useProgram();
+    this._material.setUniformValues();
+    this._material.setTextures();
 
     // WorldMatrix
     gl.uniformMatrix4fv(this.material.program._uniformWorldMatrix, false, entity.getSceneGraph().getMatrix().raw);

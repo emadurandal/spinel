@@ -1,6 +1,7 @@
-import { ShaderType, WebGLProgram } from "./definitions.js";
+import { SamplerMagFilter, SamplerMinFilter, SamplerWrapMode, ShaderType, WebGLProgram } from "./definitions.js";
 import { System } from "./System.js";
 import { Vector4 } from "./math/Vector4.js";
+import { Texture2D } from "./Texture.js";
 
 export class Material {
   private static readonly vertexShaderStr = `
@@ -8,7 +9,9 @@ precision highp float;
 
 attribute vec3 a_position;
 attribute vec4 a_color;
+attribute vec2 a_texcoord;
 varying vec4 v_color;
+varying vec2 v_texcoord;
 uniform mat4 u_worldMatrix;
 uniform mat4 u_viewMatrix;
 uniform mat4 u_projectionMatrix;
@@ -16,6 +19,7 @@ uniform mat4 u_projectionMatrix;
 void main(void) {
   gl_Position = u_projectionMatrix * u_viewMatrix * u_worldMatrix * vec4(a_position, 1.0);
   v_color = a_color;
+  v_texcoord = a_texcoord;
 }
 `;
 
@@ -23,15 +27,19 @@ private static readonly fragmentShaderStr = `
 precision highp float;
 
 varying vec4 v_color;
+varying vec2 v_texcoord;
 uniform vec4 u_baseColor;
+uniform sampler2D u_baseColorTexture;
 
 void main(void) {
-  gl_FragColor = v_color * u_baseColor;
+  gl_FragColor = v_color * u_baseColor * texture2D(u_baseColorTexture, v_texcoord);
 }
 `;
 
   private _program: WebGLProgram;
   private _baseColor = new Vector4(1, 1, 1, 1);
+  private _baseColorTexture?: Texture2D;
+  private static _defaultWhiteTexture: Texture2D;
 
   constructor() {
     const gl = System.gl;
@@ -61,9 +69,20 @@ void main(void) {
     shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
     shaderProgram._uniformViewMatrix = gl.getUniformLocation(shaderProgram, 'u_viewMatrix')!;
     shaderProgram._uniformProjectionMatrix = gl.getUniformLocation(shaderProgram, 'u_projectionMatrix')!;
+    shaderProgram._uniformBaseColorTexture = gl.getUniformLocation(shaderProgram, 'u_baseColorTexture')!;
 
     this._program = shaderProgram;
 
+    if (Material._defaultWhiteTexture == null) {
+      Material._defaultWhiteTexture = new Texture2D();
+      Material._defaultWhiteTexture.load1x1(new Vector4(1, 1, 1, 1), {
+        magFilter: SamplerMagFilter.Nearest,
+        minFilter: SamplerMinFilter.Nearest,
+        wrapS: SamplerWrapMode.Repeat,
+        wrapT: SamplerWrapMode.Repeat,
+        generateMipmap: false
+      });
+    }
   }
 
 
@@ -96,19 +115,34 @@ void main(void) {
     return this._program
   }
 
-  setUniformValues(gl: WebGLRenderingContext) {
+  setUniformValues() {
+    const gl = System.gl;
     gl.uniform4fv(this._program._uniformBaseColor, this._baseColor.raw);
+    gl.uniform1i(this._program._uniformBaseColorTexture, 0);
   }
 
-  set baseColor(color: Vector4) {
+  setTextures() {
+    if (this._baseColorTexture != null) {
+      this._baseColorTexture.bind();
+    } else {
+      Material._defaultWhiteTexture.bind();
+    }
+  }
+
+  setBaseColor(color: Vector4) {
     this._baseColor = color;
   }
 
-  get baseColor(): Vector4 {
-    return this._baseColor;
+  getBaseColor(): Vector4 {
+    return this._baseColor.clone();
   }
 
-  useProgram(gl: WebGLRenderingContext) {
+  setBaseColorTexture(texture: Texture2D) {
+    this._baseColorTexture = texture;
+  }
+
+  useProgram() {
+    const gl = System.gl;
     gl.useProgram(this._program);
   }
 }

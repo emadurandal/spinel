@@ -10,6 +10,7 @@ export interface WebGLProgram {
   _uniformWorldMatrix: WebGLUniformLocation;
   _uniformViewMatrix: WebGLUniformLocation;
   _uniformProjectionMatrix: WebGLUniformLocation;
+  _uniformBaseColorTexture: WebGLUniformLocation;
 }
 
 export const CameraType = {

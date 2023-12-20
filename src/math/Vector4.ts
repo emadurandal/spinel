@@ -19,6 +19,10 @@ export class Vector4 {
   toVector3() {
     return new Vector3(this.x, this.y, this.z);
   }
+
+  clone() {
+    return new Vector4(this.x, this.y, this.z, this.w);
+  }
   
   static zero() {
     return new Vector4(0, 0, 0, 1);
