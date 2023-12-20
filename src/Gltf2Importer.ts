@@ -17,13 +17,11 @@ export class Gltf2Importer {
   private constructor() {}
 
   static async import(uri: string): Promise<Entity[]> {
-    let response: Response;
     const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
-    try {
-      response = await fetch(uri);
-    } catch (err) {
-      console.log('glTF2 load error.', err);
-    };
+    const response = await fetch(uri);
+    if (!response.ok) {
+      throw new Error('Failed to load glTF file. Status: ' + response.status + ' ' + response.statusText);
+    }
     const arrayBuffer = await response!.arrayBuffer();
     const gotText = this._arrayBufferToString(arrayBuffer);
     const json = JSON.parse(gotText) as Gltf2
