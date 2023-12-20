@@ -25,7 +25,7 @@ export class Texture2D {
       return this._height;
   }
   
-  loadByUrl(url: string, param: TextureParameters) {
+  loadByUrl(url: string, param: TextureParameters, callback?: () => void) {
     const image = new Image();
     image.onload = () => {
       this._width = image.width;
@@ -47,6 +47,10 @@ export class Texture2D {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, param.wrapT);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param.magFilter);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param.minFilter);
+
+      if (callback != null) {
+        callback();
+      }
     };
 
     image.src = url;

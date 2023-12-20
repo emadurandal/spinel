@@ -3,7 +3,7 @@ async function main() {
     const canvas = document.getElementById('world');
     Spinel.System.setup(canvas);
     // const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/2CylinderEngine/glTF/2CylinderEngine.gltf');
-    const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Avocado/glTF/Avocado.gltf');
+    const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/Avocado/glTF-Binary/Avocado.glb');
     // const entities = await Spinel.Gltf2Importer.import('../../assets/gltf/glTF-Sample-Models/2.0/GearboxAssy/glTF/GearboxAssy.gltf');
     const cameraEntity = Spinel.Entity.create();
     cameraEntity.getTransform().setLocalPosition(new Spinel.Vector3(0, 0, 0));
