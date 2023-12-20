@@ -72,13 +72,17 @@ export class Texture2D {
     this._texture = texture;
   }
 
-  destroy() {
-    const gl = System.gl;
-    gl.deleteTexture(this._texture);
+  isReady() {
+    return this._texture != null;
   }
 
   bind() {
     const gl = System.gl;
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
+  }
+  
+  destroy() {
+    const gl = System.gl;
+    gl.deleteTexture(this._texture);
   }
 }

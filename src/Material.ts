@@ -124,7 +124,7 @@ void main(void) {
   }
 
   setTextures() {
-    if (this._baseColorTexture != null) {
+    if (this._baseColorTexture != null && this._baseColorTexture.isReady()) {
       this._baseColorTexture.bind();
     } else {
       Material._defaultWhiteTexture.bind();
