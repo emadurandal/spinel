@@ -45,8 +45,14 @@ export class AABB {
     }
 
     const newAABB = new AABB();
-    newAABB.addPoint(matrix.multiplyVector(this._min).toVector3());
-    newAABB.addPoint(matrix.multiplyVector(this._max).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._min.x, this._min.y, this._min.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._min.x, this._min.y, this._max.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._min.x, this._max.y, this._min.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._max.x, this._min.y, this._min.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._min.x, this._max.y, this._max.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._max.x, this._min.y, this._max.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._max.x, this._max.y, this._min.z)).toVector3());
+    newAABB.addPoint(matrix.multiplyVector(new Vector3(this._max.x, this._max.y, this._max.z)).toVector3());
 
     return newAABB;
   }
