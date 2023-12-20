@@ -4,7 +4,7 @@ import { Entity } from "./ec/Entity.js";
 export class System {
   private static _gl: WebGLRenderingContext;
   static setup(canvas: HTMLCanvasElement) {
-    const gl = canvas.getContext('webgl') as WebGLRenderingContext;
+    const gl = canvas.getContext('webgl2') as WebGLRenderingContext;
 
     if (gl == null) {
       alert('Failed to initialize WebGL.');

@@ -4,14 +4,14 @@ import { Vector4 } from "./math/Vector4.js";
 import { Texture2D } from "./Texture.js";
 
 export class Material {
-  private static readonly vertexShaderStr = `
+  private static readonly vertexShaderStr = `#version 300 es
 precision highp float;
 
-attribute vec3 a_position;
-attribute vec4 a_color;
-attribute vec2 a_texcoord;
-varying vec4 v_color;
-varying vec2 v_texcoord;
+in vec3 a_position;
+in vec4 a_color;
+in vec2 a_texcoord;
+out vec4 v_color;
+out vec2 v_texcoord;
 uniform mat4 u_worldMatrix;
 uniform mat4 u_viewMatrix;
 uniform mat4 u_projectionMatrix;
@@ -23,16 +23,17 @@ void main(void) {
 }
 `;
 
-private static readonly fragmentShaderStr = `
+private static readonly fragmentShaderStr = `#version 300 es
 precision highp float;
+layout(location = 0) out vec4 rt0;
 
-varying vec4 v_color;
-varying vec2 v_texcoord;
+in vec4 v_color;
+in vec2 v_texcoord;
 uniform vec4 u_baseColor;
 uniform sampler2D u_baseColorTexture;
 
 void main(void) {
-  gl_FragColor = v_color * u_baseColor * texture2D(u_baseColorTexture, v_texcoord);
+  rt0 = v_color * u_baseColor * texture(u_baseColorTexture, v_texcoord);
 }
 `;
 
