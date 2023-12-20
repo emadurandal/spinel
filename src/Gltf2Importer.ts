@@ -265,8 +265,8 @@ export class Gltf2Importer {
   private static getIndices(json: Gltf2, indicesIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[indicesIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
-    const byteOffsetOfBufferView = bufferView.byteOffset!;
-    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffsetOfBufferView = bufferView.byteOffset ?? 0;
+    const byteOffsetOfAccessor = accessor.byteOffset ?? 0;
     const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
     const componentBytes = this._componentBytes(accessor.componentType);
     const componentNum = this._componentNum(accessor.type);
@@ -280,8 +280,8 @@ export class Gltf2Importer {
   private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
-    const byteOffsetOfBufferView = bufferView.byteOffset!;
-    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffsetOfBufferView = bufferView.byteOffset ?? 0;
+    const byteOffsetOfAccessor = accessor.byteOffset ?? 0;
     const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
     const componentBytes = this._componentBytes(accessor.componentType);
     const componentNum = this._componentNum(accessor.type);
