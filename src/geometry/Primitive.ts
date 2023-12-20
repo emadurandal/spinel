@@ -19,6 +19,7 @@ export type VertexAttributeSet = {
 export class Primitive {
   private _positionBuffer: WebGLBuffer;
   private _colorBuffer?: WebGLBuffer;
+  private _texcoordBuffer?: WebGLBuffer;
   private _indexBuffer?: WebGLBuffer;
   private _indexType: 5123 | 5125 = 5123; // gl.UNSIGNED_SHORT | gl.UNSIGNED_INT
   private _mode: PrimitiveMode = PrimitiveMode.Triangles;
@@ -28,6 +29,7 @@ export class Primitive {
   private _material: Material;
   private static readonly _positionComponentNumber = 3;
   private static readonly _colorComponentNumber = 4;
+  private static readonly _texcoordComponentNumber = 2;
   private _localAabb = new AABB();
 
   constructor(material: Material, vertexData: VertexAttributeSet) {
@@ -36,6 +38,7 @@ export class Primitive {
 
     this._positionBuffer = this._setupVertexBuffer(vertexData.position)!;
     this._colorBuffer = this._setupVertexBuffer(vertexData.color);
+    this._texcoordBuffer = this._setupVertexBuffer(vertexData.texcoord);
 
     if (vertexData.indices != null) {
       this._indexBuffer = this._setupIndexBuffer(vertexData.indices);
@@ -90,7 +93,9 @@ export class Primitive {
     } else {
       const gl = System.gl;
       gl.disableVertexAttribArray(attributeSlot);
-      if (defaultValue.length === 3) {
+      if (defaultValue.length === 2) {
+        gl.vertexAttrib2fv(attributeSlot, defaultValue);
+      } else if (defaultValue.length === 3) {
         gl.vertexAttrib3fv(attributeSlot, defaultValue);
       } else if (defaultValue.length === 4) {
         gl.vertexAttrib4fv(attributeSlot, defaultValue);
@@ -103,6 +108,7 @@ export class Primitive {
 
     this._setVertexAttrib(this._positionBuffer, this.material.program!._attributePosition, Primitive._positionComponentNumber, [0, 0, 0]);
     this._setVertexAttrib(this._colorBuffer, this.material.program!._attributeColor, Primitive._colorComponentNumber, [1, 1, 1, 1]);
+    this._setVertexAttrib(this._texcoordBuffer, this.material.program!._attributeTexcoord, Primitive._texcoordComponentNumber, [0, 0]);
 
     this._material.useProgram();
     this._material.setUniformValues();

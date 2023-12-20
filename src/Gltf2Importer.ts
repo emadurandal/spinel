@@ -151,6 +151,11 @@ export class Gltf2Importer {
           colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
         }
 
+        let texcoordTypedArray: Float32Array | undefined;
+        if (attributes.TEXCOORD_0) {
+          texcoordTypedArray = this.getAttribute(json, attributes.TEXCOORD_0, arrayBufferBin);
+        }
+
         let indicesTypedArray: Uint16Array | Uint32Array | undefined;
         if (primitiveJson.indices != null) {
           indicesTypedArray = this.getIndices(json, primitiveJson.indices, arrayBufferBin);
@@ -165,6 +170,7 @@ export class Gltf2Importer {
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
           color: colorTypedArray,
+          texcoord: texcoordTypedArray,
           indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
           aabb: aabb,

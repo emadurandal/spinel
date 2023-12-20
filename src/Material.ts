@@ -65,6 +65,7 @@ void main(void) {
 
     shaderProgram._attributePosition = gl.getAttribLocation(shaderProgram, "a_position");
     shaderProgram._attributeColor = gl.getAttribLocation(shaderProgram, "a_color");
+    shaderProgram._attributeTexcoord = gl.getAttribLocation(shaderProgram, "a_texcoord");
 
     shaderProgram._uniformBaseColor = gl.getUniformLocation(shaderProgram, 'u_baseColor')!;
     shaderProgram._uniformWorldMatrix = gl.getUniformLocation(shaderProgram, 'u_worldMatrix')!;
