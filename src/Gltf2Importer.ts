@@ -1,16 +1,16 @@
 import { Primitive, VertexAttributeSet } from './geometry/Primitive.js';
 import { Gltf2Accessor, Gltf2BufferView, Gltf2, Gltf2Attribute } from './glTF2.js';
 import { Material } from './Material.js';
-import { System } from './System.js';
 import { Vector4 } from './math/Vector4.js';
 import { Mesh } from './geometry/Mesh.js';
 import { Entity } from './ec/Entity.js';
 import { Vector3 } from './math/Vector3.js';
 import { Quaternion } from './math/Quaternion.js';
 import { Matrix4 } from './math/Matrix4.js';
-import { CameraType, PrimitiveMode } from './definitions.js';
+import { CameraType, PrimitiveMode, SamplerMagFilter, SamplerMinFilter, SamplerWrapMode } from './definitions.js';
 import { CameraComponent } from './ec/components/Camera/CameraComponent.js';
 import { AABB } from './math/AABB.js';
+import { Texture2D, TextureParameters } from './Texture2D.js';
 
 export class Gltf2Importer {
 
@@ -18,6 +18,7 @@ export class Gltf2Importer {
 
   static async import(uri: string): Promise<Entity[]> {
     let response: Response;
+    const basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     try {
       response = await fetch(uri);
     } catch (err) {
@@ -29,7 +30,8 @@ export class Gltf2Importer {
 
     const arrayBufferBin = await this._loadBin(json, uri);
 
-    const meshes = this._loadMesh(arrayBufferBin, json);
+    const textures = this._loadTexture(json, basePath);
+    const meshes = this._loadMesh(arrayBufferBin, json, textures);
     const entities = this._loadNode(json, meshes);
 
     return entities;
@@ -113,7 +115,36 @@ export class Gltf2Importer {
     }
   }
 
-  private static _loadMaterial(json: Gltf2, materialIndex: number) {
+  private static _loadTexture(json: Gltf2, basePath: string) {
+    const textures: Texture2D[] = [];
+    for (let textureJson of json.textures) {
+      const imageJson = json.images[textureJson.source!];
+
+      // get sampler info
+      const textureParameters: TextureParameters = {
+        magFilter: SamplerMagFilter.Linear,
+        minFilter: SamplerMinFilter.LinearMipmapLinear,
+        wrapS: SamplerWrapMode.Repeat,
+        wrapT: SamplerWrapMode.Repeat,
+        generateMipmap: true,
+      }
+      if (textureJson.sampler != null) {
+        const sampler = json.samplers[textureJson.sampler]
+        textureParameters.magFilter = sampler.magFilter as SamplerMagFilter ?? SamplerMagFilter.Linear;
+        textureParameters.minFilter = sampler.minFilter as SamplerMinFilter ?? SamplerMinFilter.LinearMipmapLinear;
+      }
+
+      const tex = new Texture2D();
+      if (imageJson.uri != null) {
+        tex.loadByUrl(basePath + imageJson.uri, textureParameters);
+      }
+      textures.push(tex);
+    }
+
+    return textures;
+  }
+
+  private static _loadMaterial(json: Gltf2, materialIndex: number, textures: Texture2D[]) {
     const material = new Material();
 
     if (materialIndex >= 0) {
@@ -127,13 +158,20 @@ export class Gltf2Importer {
         }
       }
 
-      material.baseColor = baseColor;
+      if (materialJson.pbrMetallicRoughness != null) {
+        if (materialJson.pbrMetallicRoughness.baseColorTexture != null) {
+          const textureIndex = materialJson.pbrMetallicRoughness.baseColorTexture.index;
+          material.setBaseColorTexture(textures[textureIndex]);
+        }
+      }
+
+      material.setBaseColor(baseColor);
     }
 
     return material;
   }
 
-  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2) {
+  private static _loadMesh(arrayBufferBin: ArrayBuffer, json: Gltf2, textures: Texture2D[]) {
     const meshes: Mesh[] = []
     for (let meshJson of json.meshes) {
       const primitives: Primitive[] = [];
@@ -144,12 +182,17 @@ export class Gltf2Importer {
         if (primitiveJson.material != null) {
           materialIndex = primitiveJson.material;
         }
-        const material = this._loadMaterial(json, materialIndex);
+        const material = this._loadMaterial(json, materialIndex, textures);
 
         const positionTypedArray = this.getAttribute(json, attributes.POSITION, arrayBufferBin);
         let colorTypedArray: Float32Array | undefined;
-        if (attributes.COLOR_0) {
+        if (attributes.COLOR_0 != null) {
           colorTypedArray = this.getAttribute(json, attributes.COLOR_0, arrayBufferBin);
+        }
+
+        let texcoordTypedArray: Float32Array | undefined;
+        if (attributes.TEXCOORD_0 != null) {
+          texcoordTypedArray = this.getAttribute(json, attributes.TEXCOORD_0, arrayBufferBin);
         }
 
         let indicesTypedArray: Uint16Array | Uint32Array | undefined;
@@ -166,6 +209,7 @@ export class Gltf2Importer {
         const vertexData: VertexAttributeSet = {
           position: positionTypedArray,
           color: colorTypedArray,
+          texcoord: texcoordTypedArray,
           indices: indicesTypedArray,
           mode: (primitiveJson.mode as PrimitiveMode) ?? PrimitiveMode.Triangles,
           aabb: aabb,
@@ -260,8 +304,8 @@ export class Gltf2Importer {
   private static getIndices(json: Gltf2, indicesIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[indicesIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
-    const byteOffsetOfBufferView = bufferView.byteOffset!;
-    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffsetOfBufferView = bufferView.byteOffset ?? 0;
+    const byteOffsetOfAccessor = accessor.byteOffset ?? 0;
     const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
     const componentBytes = this._componentBytes(accessor.componentType);
     const componentNum = this._componentNum(accessor.type);
@@ -275,8 +319,8 @@ export class Gltf2Importer {
   private static getAttribute(json: Gltf2, attributeIndex: number, arrayBufferBin: ArrayBuffer) {
     const accessor = json.accessors[attributeIndex] as Gltf2Accessor;
     const bufferView = json.bufferViews[accessor.bufferView!] as Gltf2BufferView;
-    const byteOffsetOfBufferView = bufferView.byteOffset!;
-    const byteOffsetOfAccessor = accessor.byteOffset!;
+    const byteOffsetOfBufferView = bufferView.byteOffset ?? 0;
+    const byteOffsetOfAccessor = accessor.byteOffset ?? 0;
     const byteOffset = byteOffsetOfBufferView + byteOffsetOfAccessor;
     const componentBytes = this._componentBytes(accessor.componentType);
     const componentNum = this._componentNum(accessor.type);
